@@ -1,3 +1,3 @@
 Read the index page:
-<dyad-read path="src/pages/Index.tsx"></dyad-read>
+<oliveagent-read path="src/pages/Index.tsx"></oliveagent-read>
 Done.

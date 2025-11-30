@@ -6,9 +6,9 @@ import { walk } from "estree-walker";
 const VALID_EXTENSIONS = new Set([".jsx", ".tsx"]);
 
 /**
- * A webpack loader that adds `data-dyad-*` attributes to JSX elements.
+ * A webpack loader that adds `data-oliveagent-*` attributes to JSX elements.
  */
-export default function dyadTaggerLoader(this: any, code: string) {
+export default function oliveagentTaggerLoader(this: any, code: string) {
   // Signal that this is an async loader
   const callback = this.async();
 
@@ -48,26 +48,26 @@ export default function dyadTaggerLoader(this: any, code: string) {
             const alreadyTagged = node.attributes?.some(
               (attr: any) =>
                 attr.type === "JSXAttribute" &&
-                attr.name?.name === "data-dyad-id",
+                attr.name?.name === "data-oliveagent-id",
             );
             if (alreadyTagged) return;
 
-            // Build the dyad ID
+            // Build the oliveagent ID
             const loc = node.loc?.start;
             if (!loc) return;
-            const dyadId = `${fileRelative}:${loc.line}:${loc.column}`;
+            const oliveagentId = `${fileRelative}:${loc.line}:${loc.column}`;
 
             // Inject the attributes
             if (node.name.end != null) {
               ms.appendLeft(
                 node.name.end,
-                ` data-dyad-id="${dyadId}" data-dyad-name="${tagName}"`,
+                ` data-oliveagent-id="${oliveagentId}" data-oliveagent-name="${tagName}"`,
               );
               transformCount++;
             }
           } catch (error) {
             console.warn(
-              `[dyad-tagger] Warning: Failed to process JSX node in ${this.resourcePath}:`,
+              `[oliveagent-tagger] Warning: Failed to process JSX node in ${this.resourcePath}:`,
               error,
             );
           }
@@ -86,7 +86,7 @@ export default function dyadTaggerLoader(this: any, code: string) {
       };
     } catch (error) {
       console.warn(
-        `[dyad-tagger] Warning: Failed to transform ${this.resourcePath}:`,
+        `[oliveagent-tagger] Warning: Failed to transform ${this.resourcePath}:`,
         error,
       );
       return null;
@@ -102,7 +102,7 @@ export default function dyadTaggerLoader(this: any, code: string) {
       }
     })
     .catch((err) => {
-      console.error(`[dyad-tagger] ERROR in ${this.resourcePath}:`, err);
+      console.error(`[oliveagent-tagger] ERROR in ${this.resourcePath}:`, err);
       // Return original code instead of throwing
       callback(null, code);
     });

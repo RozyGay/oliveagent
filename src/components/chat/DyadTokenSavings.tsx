@@ -2,12 +2,12 @@ import React from "react";
 import { Zap } from "lucide-react";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 
-interface DyadTokenSavingsProps {
+interface OliveAgentTokenSavingsProps {
   originalTokens: number;
   smartContextTokens: number;
 }
 
-export const DyadTokenSavings: React.FC<DyadTokenSavingsProps> = ({
+export const OliveAgentTokenSavings: React.FC<OliveAgentTokenSavingsProps> = ({
   originalTokens,
   smartContextTokens,
 }) => {

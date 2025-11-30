@@ -22,7 +22,7 @@ import {
   SUPABASE_AVAILABLE_SYSTEM_PROMPT,
   SUPABASE_NOT_AVAILABLE_SYSTEM_PROMPT,
 } from "../../prompts/supabase_prompt";
-import { getDyadAppPath } from "../../paths/paths";
+import { getOliveAgentAppPath } from "../../paths/paths";
 import { readSettings } from "../../main/settings";
 import type { ChatResponseEnd, ChatStreamParams } from "../ipc_types";
 import {
@@ -64,11 +64,11 @@ import { generateProblemReport } from "../processors/tsc";
 import { createProblemFixPrompt } from "@/shared/problem_prompt";
 import { AsyncVirtualFileSystem } from "../../../shared/VirtualFilesystem";
 import {
-  getDyadAddDependencyTags,
-  getDyadWriteTags,
-  getDyadDeleteTags,
-  getDyadRenameTags,
-} from "../utils/dyad_tag_parser";
+  getOliveAgentAddDependencyTags,
+  getOliveAgentWriteTags,
+  getOliveAgentDeleteTags,
+  getOliveAgentRenameTags,
+} from "../utils/oliveagent_tag_parser";
 import { fileExists } from "../utils/file_utils";
 import { FileUploadsState } from "../utils/file_uploads_state";
 import { OpenAIResponsesProviderOptions } from "@ai-sdk/openai";
@@ -98,7 +98,7 @@ const activeStreams = new Map<number, AbortController>();
 const partialResponses = new Map<number, string>();
 
 // Directory for storing temporary files
-const TEMP_DIR = path.join(os.tmpdir(), "dyad-attachments");
+const TEMP_DIR = path.join(os.tmpdir(), "oliveagent-attachments");
 
 // Common helper functions
 const TEXT_FILE_EXTENSIONS = [
@@ -185,15 +185,15 @@ async function processStreamChunks({
         inThinkingBlock = true;
       }
 
-      chunk += escapeDyadTags(part.text);
+      chunk += escapeOliveAgentTags(part.text);
     } else if (part.type === "tool-call") {
       const { serverName, toolName } = parseMcpToolKey(part.toolName);
-      const content = escapeDyadTags(JSON.stringify(part.input));
-      chunk = `<dyad-mcp-tool-call server="${serverName}" tool="${toolName}">\n${content}\n</dyad-mcp-tool-call>\n`;
+      const content = escapeOliveAgentTags(JSON.stringify(part.input));
+      chunk = `<oliveagent-mcp-tool-call server="${serverName}" tool="${toolName}">\n${content}\n</oliveagent-mcp-tool-call>\n`;
     } else if (part.type === "tool-result") {
       const { serverName, toolName } = parseMcpToolKey(part.toolName);
-      const content = escapeDyadTags(part.output);
-      chunk = `<dyad-mcp-tool-result server="${serverName}" tool="${toolName}">\n${content}\n</dyad-mcp-tool-result>\n`;
+      const content = escapeOliveAgentTags(part.output);
+      chunk = `<oliveagent-mcp-tool-result server="${serverName}" tool="${toolName}">\n${content}\n</oliveagent-mcp-tool-result>\n`;
     }
 
     if (!chunk) {
@@ -221,7 +221,7 @@ export function registerChatStreamHandlers() {
   ipcMain.handle("chat:stream", async (event, req: ChatStreamParams) => {
     try {
       const fileUploadsState = FileUploadsState.getInstance();
-      let dyadRequestId: string | undefined;
+      let oliveagentRequestId: string | undefined;
       // Create an AbortController for this stream
       const abortController = new AbortController();
       activeStreams.set(req.chatId, abortController);
@@ -300,7 +300,7 @@ export function registerChatStreamHandlers() {
 
           if (attachment.attachmentType === "upload-to-codebase") {
             // For upload-to-codebase, create a unique file ID and store the mapping
-            const fileId = `DYAD_ATTACHMENT_${index}`;
+            const fileId = `OLIVEAGENT_ATTACHMENT_${index}`;
 
             fileUploadsState.addFileUpload(
               { chatId: req.chatId, fileId },
@@ -310,7 +310,7 @@ export function registerChatStreamHandlers() {
               },
             );
 
-            // Add instruction for AI to use dyad-write tag
+            // Add instruction for AI to use oliveagent-write tag
             attachmentInfo += `\n\nFile to upload to codebase: ${attachment.name} (file id: ${fileId})\n`;
           } else {
             // For chat-context, use the existing logic
@@ -318,8 +318,8 @@ export function registerChatStreamHandlers() {
             // If it's a text-based file, try to include the content
             if (await isTextFile(filePath)) {
               try {
-                attachmentInfo += `<dyad-text-attachment filename="${attachment.name}" type="${attachment.type}" path="${filePath}">
-                </dyad-text-attachment>
+                attachmentInfo += `<oliveagent-text-attachment filename="${attachment.name}" type="${attachment.type}" path="${filePath}">
+                </oliveagent-text-attachment>
                 \n\n`;
               } catch (err) {
                 logger.error(`Error reading file content: ${err}`);
@@ -361,7 +361,7 @@ export function registerChatStreamHandlers() {
           let componentSnippet = "[component snippet not available]";
           try {
             const componentFileContent = await readFile(
-              path.join(getDyadAppPath(chat.app.path), component.relativePath),
+              path.join(getOliveAgentAppPath(chat.app.path), component.relativePath),
               "utf8",
             );
             const lines = componentFileContent.split(/\r?\n/);
@@ -405,10 +405,10 @@ ${componentSnippet}
         })
         .returning();
       const settings = readSettings();
-      // Only Dyad Pro requests have request ids.
-      if (settings.enableDyadPro) {
+      // Only OliveAgent Pro requests have request ids.
+      if (settings.enableOliveAgentPro) {
         // Generate requestId early so it can be saved with the message
-        dyadRequestId = uuidv4();
+        oliveagentRequestId = uuidv4();
       }
 
       // Add a placeholder assistant message immediately
@@ -418,9 +418,9 @@ ${componentSnippet}
           chatId: req.chatId,
           role: "assistant",
           content: "", // Start with empty content
-          requestId: dyadRequestId,
+          requestId: oliveagentRequestId,
           sourceCommitHash: await getCurrentCommitHash({
-            path: getDyadAppPath(chat.app.path),
+            path: getOliveAgentAppPath(chat.app.path),
           }),
         })
         .returning();
@@ -465,7 +465,7 @@ ${componentSnippet}
         const { modelClient, isEngineEnabled, isSmartContextEnabled } =
           await getModelClient(settings.selectedModel, settings);
 
-        const appPath = getDyadAppPath(updatedChat.app.path);
+        const appPath = getOliveAgentAppPath(updatedChat.app.path);
         // When we don't have smart context enabled, we
         // only include the selected components' files for codebase context.
         //
@@ -491,7 +491,7 @@ ${componentSnippet}
 
         // For smart context and selected components, we will mark the selected components' files as focused.
         // This means that we don't do the regular smart context handling, but we'll allow fetching
-        // additional files through <dyad-read> as needed.
+        // additional files through <oliveagent-read> as needed.
         if (
           isSmartContextEnabled &&
           req.selectedComponents &&
@@ -548,7 +548,7 @@ ${componentSnippet}
           sourceCommitHash: message.sourceCommitHash,
         }));
 
-        // For Dyad Pro + Deep Context, we set to 200 chat turns (+1)
+        // For OliveAgent Pro + Deep Context, we set to 200 chat turns (+1)
         // this is to enable more cache hits. Practically, users should
         // rarely go over this limit because they will hit the model's
         // context window limit.
@@ -594,7 +594,7 @@ ${componentSnippet}
         }
 
         let systemPrompt = constructSystemPrompt({
-          aiRules: await readAiRules(getDyadAppPath(updatedChat.app.path)),
+          aiRules: await readAiRules(getOliveAgentAppPath(updatedChat.app.path)),
           chatMode:
             settings.selectedChatMode === "agent"
               ? "build"
@@ -616,7 +616,7 @@ ${componentSnippet}
         if (isSecurityReviewIntent) {
           systemPrompt = SECURITY_REVIEW_SYSTEM_PROMPT;
           try {
-            const appPath = getDyadAppPath(updatedChat.app.path);
+            const appPath = getOliveAgentAppPath(updatedChat.app.path);
             const rulesPath = path.join(appPath, "SECURITY_RULES.md");
             let securityRules = "";
 
@@ -673,7 +673,7 @@ ${componentSnippet}
           );
         // If there's mixed attachments (e.g. some upload to codebase attachments and some upload images as chat context attachemnts)
         // we will just include the file upload system prompt, otherwise the AI gets confused and doesn't reliably
-        // print out the dyad-write tags.
+        // print out the oliveagent-write tags.
         // Usually, AI models will want to use the image as reference to generate code (e.g. UI mockups) anyways, so
         // it's not that critical to include the image analysis instructions.
         if (hasUploadedAttachments) {
@@ -681,14 +681,14 @@ ${componentSnippet}
   
 When files are attached to this conversation, upload them to the codebase using this exact format:
 
-<dyad-write path="path/to/destination/filename.ext" description="Upload file to codebase">
-DYAD_ATTACHMENT_X
-</dyad-write>
+<oliveagent-write path="path/to/destination/filename.ext" description="Upload file to codebase">
+OLIVEAGENT_ATTACHMENT_X
+</oliveagent-write>
 
-Example for file with id of DYAD_ATTACHMENT_0:
-<dyad-write path="src/components/Button.jsx" description="Upload file to codebase">
-DYAD_ATTACHMENT_0
-</dyad-write>
+Example for file with id of OLIVEAGENT_ATTACHMENT_0:
+<oliveagent-write path="src/components/Button.jsx" description="Upload file to codebase">
+OLIVEAGENT_ATTACHMENT_0
+</oliveagent-write>
 
   `;
         } else if (hasImageAttachments) {
@@ -741,10 +741,10 @@ This conversation includes one or more image attachments. When the user uploads 
           // and eats up extra tokens.
           content:
             settings.selectedChatMode === "ask"
-              ? removeDyadTags(removeNonEssentialTags(msg.content))
+              ? removeOliveAgentTags(removeNonEssentialTags(msg.content))
               : removeNonEssentialTags(msg.content),
           providerOptions: {
-            "dyad-engine": {
+            "oliveagent-engine": {
               sourceCommitHash: msg.sourceCommitHash,
             },
           },
@@ -793,7 +793,7 @@ This conversation includes one or more image attachments. When the user uploads 
           modelClient,
           tools,
           systemPromptOverride = systemPrompt,
-          dyadDisableFiles = false,
+          oliveagentDisableFiles = false,
           files,
         }: {
           chatMessages: ModelMessage[];
@@ -801,12 +801,12 @@ This conversation includes one or more image attachments. When the user uploads 
           files: CodebaseFile[];
           tools?: ToolSet;
           systemPromptOverride?: string;
-          dyadDisableFiles?: boolean;
+          oliveagentDisableFiles?: boolean;
         }) => {
           if (isEngineEnabled) {
             logger.log(
               "sending AI request to engine with request id:",
-              dyadRequestId,
+              oliveagentRequestId,
             );
           } else {
             logger.log("sending AI request");
@@ -821,20 +821,20 @@ This conversation includes one or more image attachments. When the user uploads 
           }
           // Build provider options with correct Google/Vertex thinking config gating
           const providerOptions: Record<string, any> = {
-            "dyad-engine": {
-              dyadAppId: updatedChat.app.id,
-              dyadRequestId,
-              dyadDisableFiles,
-              dyadFiles: versionedFiles ? undefined : files,
-              dyadVersionedFiles: versionedFiles,
-              dyadMentionedApps: mentionedAppsCodebases.map(
+            "oliveagent-engine": {
+              oliveagentAppId: updatedChat.app.id,
+              oliveagentRequestId,
+              oliveagentDisableFiles,
+              oliveagentFiles: versionedFiles ? undefined : files,
+              oliveagentVersionedFiles: versionedFiles,
+              oliveagentMentionedApps: mentionedAppsCodebases.map(
                 ({ files, appName }) => ({
                   appName,
                   files,
                 }),
               ),
             },
-            "dyad-gateway": getExtraProviderOptions(
+            "oliveagent-gateway": getExtraProviderOptions(
               modelClient.builtinProviderId,
               settings,
             ),
@@ -894,7 +894,7 @@ This conversation includes one or more image attachments. When the user uploads 
               }
               const message = errorMessage || JSON.stringify(error);
               const requestIdPrefix = isEngineEnabled
-                ? `[Request ID: ${dyadRequestId}] `
+                ? `[Request ID: ${oliveagentRequestId}] `
                 : "";
               logger.error(
                 `AI stream text error for request: ${requestIdPrefix} errorMessage=${errorMessage} error=`,
@@ -976,12 +976,12 @@ This conversation includes one or more image attachments. When the user uploads 
               },
             },
             systemPromptOverride: constructSystemPrompt({
-              aiRules: await readAiRules(getDyadAppPath(updatedChat.app.path)),
+              aiRules: await readAiRules(getOliveAgentAppPath(updatedChat.app.path)),
               chatMode: "agent",
               enableTurboEditsV2: false,
             }),
             files: files,
-            dyadDisableFiles: true,
+            oliveagentDisableFiles: true,
           });
 
           const result = await processStreamChunks({
@@ -1026,7 +1026,7 @@ This conversation includes one or more image attachments. When the user uploads 
           ) {
             let issues = await dryRunSearchReplace({
               fullResponse,
-              appPath: getDyadAppPath(updatedChat.app.path),
+              appPath: getOliveAgentAppPath(updatedChat.app.path),
             });
 
             let searchReplaceFixAttempts = 0;
@@ -1046,7 +1046,7 @@ This conversation includes one or more image attachments. When the user uploads 
                 })
                 .join("\n\n");
 
-              fullResponse += `<dyad-output type="warning" message="Could not apply Turbo Edits properly for some of the files; re-generating code...">${formattedSearchReplaceIssues}</dyad-output>`;
+              fullResponse += `<oliveagent-output type="warning" message="Could not apply Turbo Edits properly for some of the files; re-generating code...">${formattedSearchReplaceIssues}</oliveagent-output>`;
               await processResponseChunkUpdate({
                 fullResponse,
               });
@@ -1057,8 +1057,8 @@ This conversation includes one or more image attachments. When the user uploads 
 
               const fixSearchReplacePrompt =
                 searchReplaceFixAttempts === 0
-                  ? `There was an issue with the following \`dyad-search-replace\` tags. Make sure you use \`dyad-read\` to read the latest version of the file and then trying to do search & replace again.`
-                  : `There was an issue with the following \`dyad-search-replace\` tags. Please fix the errors by generating the code changes using \`dyad-write\` tags instead.`;
+                  ? `There was an issue with the following \`oliveagent-search-replace\` tags. Make sure you use \`oliveagent-read\` to read the latest version of the file and then trying to do search & replace again.`
+                  : `There was an issue with the following \`oliveagent-search-replace\` tags. Please fix the errors by generating the code changes using \`oliveagent-write\` tags instead.`;
               searchReplaceFixAttempts++;
               const userPrompt = {
                 role: "user",
@@ -1096,7 +1096,7 @@ ${formattedSearchReplaceIssues}`,
               // Re-check for issues after the fix attempt
               issues = await dryRunSearchReplace({
                 fullResponse: result.incrementalResponse,
-                appPath: getDyadAppPath(updatedChat.app.path),
+                appPath: getOliveAgentAppPath(updatedChat.app.path),
               });
             }
           }
@@ -1104,16 +1104,16 @@ ${formattedSearchReplaceIssues}`,
           if (
             !abortController.signal.aborted &&
             settings.selectedChatMode !== "ask" &&
-            hasUnclosedDyadWrite(fullResponse)
+            hasUnclosedOliveAgentWrite(fullResponse)
           ) {
             let continuationAttempts = 0;
             while (
-              hasUnclosedDyadWrite(fullResponse) &&
+              hasUnclosedOliveAgentWrite(fullResponse) &&
               continuationAttempts < 2 &&
               !abortController.signal.aborted
             ) {
               logger.warn(
-                `Received unclosed dyad-write tag, attempting to continue, attempt #${continuationAttempts + 1}`,
+                `Received unclosed oliveagent-write tag, attempting to continue, attempt #${continuationAttempts + 1}`,
               );
               continuationAttempts++;
 
@@ -1141,7 +1141,7 @@ ${formattedSearchReplaceIssues}`,
               }
             }
           }
-          const addDependencies = getDyadAddDependencyTags(fullResponse);
+          const addDependencies = getOliveAgentAddDependencyTags(fullResponse);
           if (
             !abortController.signal.aborted &&
             // If there are dependencies, we don't want to auto-fix problems
@@ -1155,7 +1155,7 @@ ${formattedSearchReplaceIssues}`,
               // IF auto-fix is enabled
               let problemReport = await generateProblemReport({
                 fullResponse,
-                appPath: getDyadAppPath(updatedChat.app.path),
+                appPath: getOliveAgentAppPath(updatedChat.app.path),
               });
 
               let autoFixAttempts = 0;
@@ -1166,14 +1166,14 @@ ${formattedSearchReplaceIssues}`,
                 autoFixAttempts < 2 &&
                 !abortController.signal.aborted
               ) {
-                fullResponse += `<dyad-problem-report summary="${problemReport.problems.length} problems">
+                fullResponse += `<oliveagent-problem-report summary="${problemReport.problems.length} problems">
 ${problemReport.problems
   .map(
     (problem) =>
       `<problem file="${escapeXml(problem.file)}" line="${problem.line}" column="${problem.column}" code="${problem.code}">${escapeXml(problem.message)}</problem>`,
   )
   .join("\n")}
-</dyad-problem-report>`;
+</oliveagent-problem-report>`;
 
                 logger.info(
                   `Attempting to auto-fix problems, attempt #${autoFixAttempts + 1}`,
@@ -1182,15 +1182,15 @@ ${problemReport.problems
                 const problemFixPrompt = createProblemFixPrompt(problemReport);
 
                 const virtualFileSystem = new AsyncVirtualFileSystem(
-                  getDyadAppPath(updatedChat.app.path),
+                  getOliveAgentAppPath(updatedChat.app.path),
                   {
                     fileExists: (fileName: string) => fileExists(fileName),
                     readFile: (fileName: string) => readFileWithCache(fileName),
                   },
                 );
-                const writeTags = getDyadWriteTags(fullResponse);
-                const renameTags = getDyadRenameTags(fullResponse);
-                const deletePaths = getDyadDeleteTags(fullResponse);
+                const writeTags = getOliveAgentWriteTags(fullResponse);
+                const renameTags = getOliveAgentRenameTags(fullResponse);
+                const deletePaths = getOliveAgentDeleteTags(fullResponse);
                 virtualFileSystem.applyResponseChanges({
                   deletePaths,
                   renameTags,
@@ -1253,7 +1253,7 @@ ${problemReport.problems
 
                 problemReport = await generateProblemReport({
                   fullResponse,
-                  appPath: getDyadAppPath(updatedChat.app.path),
+                  appPath: getOliveAgentAppPath(updatedChat.app.path),
                 });
               }
             } catch (error) {
@@ -1301,9 +1301,9 @@ ${problemReport.problems
 
       // Only save the response and process it if we weren't aborted
       if (!abortController.signal.aborted && fullResponse) {
-        // Scrape from: <dyad-chat-summary>Renaming profile file</dyad-chat-title>
+        // Scrape from: <oliveagent-chat-summary>Renaming profile file</oliveagent-chat-title>
         const chatTitle = fullResponse.match(
-          /<dyad-chat-summary>(.*?)<\/dyad-chat-summary>/,
+          /<oliveagent-chat-summary>(.*?)<\/oliveagent-chat-summary>/,
         );
         if (chatTitle) {
           await db
@@ -1476,7 +1476,7 @@ async function replaceTextAttachmentWithContent(
       // Replace the placeholder tag with the full content
       const escapedPath = filePath.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const tagPattern = new RegExp(
-        `<dyad-text-attachment filename="[^"]*" type="[^"]*" path="${escapedPath}">\\s*<\\/dyad-text-attachment>`,
+        `<oliveagent-text-attachment filename="[^"]*" type="[^"]*" path="${escapedPath}">\\s*<\\/oliveagent-text-attachment>`,
         "g",
       );
 
@@ -1569,18 +1569,18 @@ function removeThinkingTags(text: string): string {
 
 export function removeProblemReportTags(text: string): string {
   const problemReportRegex =
-    /<dyad-problem-report[^>]*>[\s\S]*?<\/dyad-problem-report>/g;
+    /<oliveagent-problem-report[^>]*>[\s\S]*?<\/oliveagent-problem-report>/g;
   return text.replace(problemReportRegex, "").trim();
 }
 
-export function removeDyadTags(text: string): string {
-  const dyadRegex = /<dyad-[^>]*>[\s\S]*?<\/dyad-[^>]*>/g;
-  return text.replace(dyadRegex, "").trim();
+export function removeOliveAgentTags(text: string): string {
+  const oliveagentRegex = /<oliveagent-[^>]*>[\s\S]*?<\/oliveagent-[^>]*>/g;
+  return text.replace(oliveagentRegex, "").trim();
 }
 
-export function hasUnclosedDyadWrite(text: string): boolean {
-  // Find the last opening dyad-write tag
-  const openRegex = /<dyad-write[^>]*>/g;
+export function hasUnclosedOliveAgentWrite(text: string): boolean {
+  // Find the last opening oliveagent-write tag
+  const openRegex = /<oliveagent-write[^>]*>/g;
   let lastOpenIndex = -1;
   let match;
 
@@ -1595,19 +1595,19 @@ export function hasUnclosedDyadWrite(text: string): boolean {
 
   // Look for a closing tag after the last opening tag
   const textAfterLastOpen = text.substring(lastOpenIndex);
-  const hasClosingTag = /<\/dyad-write>/.test(textAfterLastOpen);
+  const hasClosingTag = /<\/oliveagent-write>/.test(textAfterLastOpen);
 
   return !hasClosingTag;
 }
 
-function escapeDyadTags(text: string): string {
-  // Escape dyad tags in reasoning content
+function escapeOliveAgentTags(text: string): string {
+  // Escape oliveagent tags in reasoning content
   // We are replacing the opening tag with a look-alike character
-  // to avoid issues where thinking content includes dyad tags
+  // to avoid issues where thinking content includes oliveagent tags
   // and are mishandled by:
   // 1. FE markdown parser
   // 2. Main process response processor
-  return text.replace(/<dyad/g, "＜dyad").replace(/<\/dyad/g, "＜/dyad");
+  return text.replace(/<oliveagent/g, "＜oliveagent").replace(/<\/oliveagent/g, "＜/oliveagent");
 }
 
 const CODEBASE_PROMPT_PREFIX = "This is my codebase.";

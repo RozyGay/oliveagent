@@ -2,19 +2,19 @@ import { useState, useRef, useEffect } from "react";
 import { getLanguage } from "@/utils/get_language";
 
 const CUSTOM_TAG_NAMES = [
-  "dyad-write",
-  "dyad-rename",
-  "dyad-delete",
-  "dyad-add-dependency",
-  "dyad-execute-sql",
-  "dyad-add-integration",
-  "dyad-output",
-  "dyad-problem-report",
-  "dyad-chat-summary",
-  "dyad-edit",
-  "dyad-codebase-context",
+  "oliveagent-write",
+  "oliveagent-rename",
+  "oliveagent-delete",
+  "oliveagent-add-dependency",
+  "oliveagent-execute-sql",
+  "oliveagent-add-integration",
+  "oliveagent-output",
+  "oliveagent-problem-report",
+  "oliveagent-chat-summary",
+  "oliveagent-edit",
+  "oliveagent-codebase-context",
   "think",
-  "dyad-command",
+  "oliveagent-command",
 ];
 export const useCopyToClipboard = () => {
   const [copied, setCopied] = useState(false);
@@ -29,8 +29,8 @@ export const useCopyToClipboard = () => {
 
   const copyMessageContent = async (messageContent: string) => {
     try {
-      // Use the same parsing logic as DyadMarkdownParser but convert to clean text
-      const formattedContent = convertDyadContentToMarkdown(messageContent);
+      // Use the same parsing logic as OliveAgentMarkdownParser but convert to clean text
+      const formattedContent = convertOliveAgentContentToMarkdown(messageContent);
 
       // Copy to clipboard
       await navigator.clipboard.writeText(formattedContent);
@@ -50,11 +50,11 @@ export const useCopyToClipboard = () => {
     }
   };
 
-  // Convert Dyad content to clean markdown using the same parsing logic as DyadMarkdownParser
-  const convertDyadContentToMarkdown = (content: string): string => {
+  // Convert OliveAgent content to clean markdown using the same parsing logic as OliveAgentMarkdownParser
+  const convertOliveAgentContentToMarkdown = (content: string): string => {
     if (!content) return "";
 
-    // Use the same parsing functions from DyadMarkdownParser
+    // Use the same parsing functions from OliveAgentMarkdownParser
     const contentPieces = parseCustomTags(content);
 
     let result = "";
@@ -76,7 +76,7 @@ export const useCopyToClipboard = () => {
       .trim();
   };
 
-  // Convert individual custom tags to markdown (reuse the same logic from DyadMarkdownParser)
+  // Convert individual custom tags to markdown (reuse the same logic from OliveAgentMarkdownParser)
   const convertCustomTagToMarkdown = (tagInfo: any): string => {
     const { tag, attributes, content } = tagInfo;
 
@@ -84,7 +84,7 @@ export const useCopyToClipboard = () => {
       case "think":
         return `### Thinking\n\n${content}\n\n`;
 
-      case "dyad-write": {
+      case "oliveagent-write": {
         const writePath = attributes.path || "file";
         const writeDesc = attributes.description || "";
         const language = getLanguage(writePath);
@@ -97,7 +97,7 @@ export const useCopyToClipboard = () => {
         return writeResult;
       }
 
-      case "dyad-edit": {
+      case "oliveagent-edit": {
         const editPath = attributes.path || "file";
         const editDesc = attributes.description || "";
         const editLang = getLanguage(editPath);
@@ -110,23 +110,23 @@ export const useCopyToClipboard = () => {
         return editResult;
       }
 
-      case "dyad-rename": {
+      case "oliveagent-rename": {
         const from = attributes.from || "";
         const to = attributes.to || "";
         return `### Rename: ${from} → ${to}\n\n`;
       }
 
-      case "dyad-delete": {
+      case "oliveagent-delete": {
         const deletePath = attributes.path || "";
         return `### Delete: ${deletePath}\n\n`;
       }
 
-      case "dyad-add-dependency": {
+      case "oliveagent-add-dependency": {
         const packages = attributes.packages || "";
         return `### Add Dependencies\n\n\`\`\`bash\n${packages}\n\`\`\`\n\n`;
       }
 
-      case "dyad-execute-sql": {
+      case "oliveagent-execute-sql": {
         const sqlDesc = attributes.description || "";
         let sqlResult = `### Execute SQL\n\n`;
         if (sqlDesc) {
@@ -136,12 +136,12 @@ export const useCopyToClipboard = () => {
         return sqlResult;
       }
 
-      case "dyad-add-integration": {
+      case "oliveagent-add-integration": {
         const provider = attributes.provider || "";
         return `### Add Integration: ${provider}\n\n`;
       }
 
-      case "dyad-codebase-context": {
+      case "oliveagent-codebase-context": {
         const files = attributes.files || "";
         let contextResult = `### Codebase Context\n\n`;
         if (files) {
@@ -151,7 +151,7 @@ export const useCopyToClipboard = () => {
         return contextResult;
       }
 
-      case "dyad-output": {
+      case "oliveagent-output": {
         const outputType = attributes.type || "info";
         const message = attributes.message || "";
         const emoji =
@@ -171,7 +171,7 @@ export const useCopyToClipboard = () => {
         return outputResult + "\n\n";
       }
 
-      case "dyad-problem-report": {
+      case "oliveagent-problem-report": {
         const summary = attributes.summary || "";
         let problemResult = `### Problem Report\n\n`;
         if (summary) {
@@ -183,8 +183,8 @@ export const useCopyToClipboard = () => {
         return problemResult + "\n\n";
       }
 
-      case "dyad-chat-summary":
-      case "dyad-command":
+      case "oliveagent-chat-summary":
+      case "oliveagent-command":
         // Don't include these in copy
         return "";
 
@@ -193,7 +193,7 @@ export const useCopyToClipboard = () => {
     }
   };
 
-  // Reuse the same parsing functions from DyadMarkdownParser but simplified
+  // Reuse the same parsing functions from OliveAgentMarkdownParser but simplified
   const parseCustomTags = (content: string) => {
     const { processedContent } = preprocessUnclosedTags(content);
 

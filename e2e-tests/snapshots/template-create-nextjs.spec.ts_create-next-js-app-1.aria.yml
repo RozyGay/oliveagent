@@ -1,7 +1,7 @@
 - main:
   - heading "Blank page" [level=1]
-- link "Made with Dyad (EDITED)":
-  - /url: https://www.dyad.sh/
+- link "Made with OliveAgent (EDITED)":
+  - /url: https://www.oliveagent.sh/
 - alert
 - button "Open Next.js Dev Tools":
   - img

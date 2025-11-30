@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from "react";
 import { ChevronDown, ChevronUp, FileCode, FileText } from "lucide-react";
 
-interface DyadCodeSearchResultProps {
+interface OliveAgentCodeSearchResultProps {
   node?: any;
   children?: React.ReactNode;
 }
 
-export const DyadCodeSearchResult: React.FC<DyadCodeSearchResultProps> = ({
+export const OliveAgentCodeSearchResult: React.FC<OliveAgentCodeSearchResultProps> = ({
   children,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);

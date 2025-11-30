@@ -13,14 +13,14 @@ import { CodeHighlight } from "./CodeHighlight";
 import { CustomTagState } from "./stateTypes";
 import { parseSearchReplaceBlocks } from "@/pro/shared/search_replace_parser";
 
-interface DyadSearchReplaceProps {
+interface OliveAgentSearchReplaceProps {
   children?: ReactNode;
   node?: any;
   path?: string;
   description?: string;
 }
 
-export const DyadSearchReplace: React.FC<DyadSearchReplaceProps> = ({
+export const OliveAgentSearchReplace: React.FC<OliveAgentSearchReplaceProps> = ({
   children,
   node,
   path: pathProp,

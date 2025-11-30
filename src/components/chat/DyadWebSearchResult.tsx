@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Globe, Loader } from "lucide-react";
-import { VanillaMarkdownParser } from "./DyadMarkdownParser";
+import { VanillaMarkdownParser } from "./OliveAgentMarkdownParser";
 import { CustomTagState } from "./stateTypes";
 
-interface DyadWebSearchResultProps {
+interface OliveAgentWebSearchResultProps {
   node?: any;
   children?: React.ReactNode;
 }
 
-export const DyadWebSearchResult: React.FC<DyadWebSearchResultProps> = ({
+export const OliveAgentWebSearchResult: React.FC<OliveAgentWebSearchResultProps> = ({
   children,
   node,
 }) => {

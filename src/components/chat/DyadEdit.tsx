@@ -11,14 +11,14 @@ import {
 import { CodeHighlight } from "./CodeHighlight";
 import { CustomTagState } from "./stateTypes";
 
-interface DyadEditProps {
+interface OliveAgentEditProps {
   children?: ReactNode;
   node?: any;
   path?: string;
   description?: string;
 }
 
-export const DyadEdit: React.FC<DyadEditProps> = ({
+export const OliveAgentEdit: React.FC<OliveAgentEditProps> = ({
   children,
   node,
   path: pathProp,

@@ -1,9 +1,9 @@
 Tests delete-rename-write order
-<dyad-delete path="src/main.tsx">
-</dyad-delete>
-<dyad-rename from="src/App.tsx" to="src/main.tsx">
-</dyad-rename>
-<dyad-write path="src/main.tsx" description="final main.tsx file.">
+<oliveagent-delete path="src/main.tsx">
+</oliveagent-delete>
+<oliveagent-rename from="src/App.tsx" to="src/main.tsx">
+</oliveagent-rename>
+<oliveagent-write path="src/main.tsx" description="final main.tsx file.">
 finalMainTsxFileWithError();
-</dyad-write>
+</oliveagent-write>
 EOM

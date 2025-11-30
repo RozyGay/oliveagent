@@ -2,12 +2,12 @@ import type React from "react";
 import type { ReactNode } from "react";
 import { ScanQrCode } from "lucide-react";
 
-interface DyadWebCrawlProps {
+interface OliveAgentWebCrawlProps {
   children?: ReactNode;
   node?: any;
 }
 
-export const DyadWebCrawl: React.FC<DyadWebCrawlProps> = ({
+export const OliveAgentWebCrawl: React.FC<OliveAgentWebCrawlProps> = ({
   children,
   node: _node,
 }) => {

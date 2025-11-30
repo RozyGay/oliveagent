@@ -1,5 +1,5 @@
 (() => {
-  const OVERLAY_CLASS = "__dyad_overlay__";
+  const OVERLAY_CLASS = "__oliveagent_overlay__";
   let overlays = [];
   let hoverOverlay = null;
   let hoverLabel = null;
@@ -101,8 +101,8 @@
     });
     css(hoverLabel, { background: "#7f22fe" });
     while (hoverLabel.firstChild) hoverLabel.removeChild(hoverLabel.firstChild);
-    const name = el.dataset.dyadName || "<unknown>";
-    const file = (el.dataset.dyadId || "").split(":")[0];
+    const name = el.dataset.oliveagentName || "<unknown>";
+    const file = (el.dataset.oliveagentId || "").split(":")[0];
     const nameEl = document.createElement("div");
     nameEl.textContent = name;
     hoverLabel.appendChild(nameEl);
@@ -160,7 +160,7 @@
 
   function removeOverlayById(componentId) {
     const index = overlays.findIndex(
-      ({ el }) => el.dataset.dyadId === componentId,
+      ({ el }) => el.dataset.oliveagentId === componentId,
     );
     if (index !== -1) {
       const { overlay } = overlays[index];
@@ -209,8 +209,8 @@
     label.appendChild(editLine);
 
     // Add component name and file
-    const name = el.dataset.dyadName || "<unknown>";
-    const file = (el.dataset.dyadId || "").split(":")[0];
+    const name = el.dataset.oliveagentName || "<unknown>";
+    const file = (el.dataset.oliveagentId || "").split(":")[0];
     const nameEl = document.createElement("div");
     nameEl.textContent = name;
     label.appendChild(nameEl);
@@ -228,7 +228,7 @@
   /* ---------- event handlers -------------------------------------------- */
   function onMouseMove(e) {
     let el = e.target;
-    while (el && !el.dataset.dyadId) el = el.parentElement;
+    while (el && !el.dataset.oliveagentId) el = el.parentElement;
 
     const hoveredItem = overlays.find((item) => item.el === el);
 
@@ -282,11 +282,11 @@
 
     const selectedItem = overlays.find((item) => item.el === e.target);
     if (selectedItem) {
-      removeOverlayById(state.element.dataset.dyadId);
+      removeOverlayById(state.element.dataset.oliveagentId);
       window.parent.postMessage(
         {
-          type: "dyad-component-deselected",
-          componentId: state.element.dataset.dyadId,
+          type: "oliveagent-component-deselected",
+          componentId: state.element.dataset.oliveagentId,
         },
         "*",
       );
@@ -299,10 +299,10 @@
 
     window.parent.postMessage(
       {
-        type: "dyad-component-selected",
+        type: "oliveagent-component-selected",
         component: {
-          id: state.element.dataset.dyadId,
-          name: state.element.dataset.dyadName,
+          id: state.element.dataset.oliveagentId,
+          name: state.element.dataset.oliveagentName,
         },
       },
       "*",
@@ -327,7 +327,7 @@
       e.preventDefault();
       window.parent.postMessage(
         {
-          type: "dyad-select-component-shortcut",
+          type: "oliveagent-select-component-shortcut",
         },
         "*",
       );
@@ -362,10 +362,10 @@
   /* ---------- message bridge -------------------------------------------- */
   window.addEventListener("message", (e) => {
     if (e.source !== window.parent) return;
-    if (e.data.type === "activate-dyad-component-selector") activate();
-    if (e.data.type === "deactivate-dyad-component-selector") deactivate();
-    if (e.data.type === "clear-dyad-component-overlays") clearOverlays();
-    if (e.data.type === "remove-dyad-component-overlay") {
+    if (e.data.type === "activate-oliveagent-component-selector") activate();
+    if (e.data.type === "deactivate-oliveagent-component-selector") deactivate();
+    if (e.data.type === "clear-oliveagent-component-overlays") clearOverlays();
+    if (e.data.type === "remove-oliveagent-component-overlay") {
       if (e.data.componentId) {
         removeOverlayById(e.data.componentId);
       }
@@ -386,22 +386,22 @@
   function initializeComponentSelector() {
     if (!document.body) {
       console.error(
-        "Dyad component selector initialization failed: document.body not found.",
+        "OliveAgent component selector initialization failed: document.body not found.",
       );
       return;
     }
     setTimeout(() => {
-      if (document.body.querySelector("[data-dyad-id]")) {
+      if (document.body.querySelector("[data-oliveagent-id]")) {
         window.parent.postMessage(
           {
-            type: "dyad-component-selector-initialized",
+            type: "oliveagent-component-selector-initialized",
           },
           "*",
         );
-        console.debug("Dyad component selector initialized");
+        console.debug("OliveAgent component selector initialized");
       } else {
         console.warn(
-          "Dyad component selector not initialized because no DOM elements were tagged",
+          "OliveAgent component selector not initialized because no DOM elements were tagged",
         );
       }
     }, 0);
