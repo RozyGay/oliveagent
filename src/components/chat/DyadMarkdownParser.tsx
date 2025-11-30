@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { OliveAgentWrite } from "./OliveAgentWrite";
+import { OliveAgentWrite } from "./DyadWrite";
 import { OliveAgentRename } from "./DyadRename";
 import { OliveAgentDelete } from "./DyadDelete";
 import { OliveAgentAddDependency } from "./DyadAddDependency";
