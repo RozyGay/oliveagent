@@ -255,6 +255,13 @@ export const UserSettingsSchema = z.object({
   runtimeMode2: RuntimeMode2Schema.optional(),
   customNodePath: z.string().optional().nullable(),
 
+  currentProfile: z.object({
+    username: z.string(),
+    isAdmin: z.boolean(),
+  }).optional(),
+  adminManagedKeys: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+  disabledUsers: z.array(z.string()).optional(),
+
   ////////////////////////////////
   // E2E TESTING ONLY.
   ////////////////////////////////
@@ -278,6 +285,10 @@ export function isOliveAgentProEnabled(settings: UserSettings): boolean {
 }
 
 export function hasOliveAgentProKey(settings: UserSettings): boolean {
+  return true;
+}
+
+export function isPro(): boolean {
   return true;
 }
 

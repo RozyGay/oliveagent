@@ -1327,4 +1327,35 @@ export class IpcClient {
   public cancelHelpChat(sessionId: string): void {
     this.ipcRenderer.invoke("help:chat:cancel", sessionId).catch(() => {});
   }
+
+  public async profileLogin(params: { username: string; password: string }): Promise<{
+    success: boolean;
+    profile: { username: string; isAdmin: boolean };
+  }> {
+    return this.ipcRenderer.invoke("profile:login", params);
+  }
+
+  public async profileGetCurrent(): Promise<{ username: string; isAdmin: boolean } | null> {
+    return this.ipcRenderer.invoke("profile:get-current");
+  }
+
+  public async profileLogout(): Promise<{ success: boolean }> {
+    return this.ipcRenderer.invoke("profile:logout");
+  }
+
+  public async profileAdminListUsers(): Promise<Array<{ username: string; isActive: boolean }>> {
+    return this.ipcRenderer.invoke("profile:admin:list-users");
+  }
+
+  public async profileAdminSetProviderKey(params: { username: string; provider: string; apiKey: string }): Promise<{ success: boolean }> {
+    return this.ipcRenderer.invoke("profile:admin:set-provider-key", params);
+  }
+
+  public async profileAdminToggleUser(params: { username: string; isActive: boolean }): Promise<{ success: boolean }> {
+    return this.ipcRenderer.invoke("profile:admin:toggle-user", params);
+  }
+
+  public async profileGetManagedKeys(): Promise<Record<string, string>> {
+    return this.ipcRenderer.invoke("profile:get-managed-keys");
+  }
 }
