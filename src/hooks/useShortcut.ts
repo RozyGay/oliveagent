@@ -62,7 +62,7 @@ export function useShortcut(
         return;
       }
 
-      if (event.data?.type === "dyad-select-component-shortcut") {
+      if (event.data?.type === "oliveagent-select-component-shortcut") {
         if (isComponentSelectorInitialized) {
           callback();
         }

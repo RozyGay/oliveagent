@@ -1,3 +1,3 @@
 chat2
 
-<dyad-chat-summary>Chat 2</dyad-chat-summary>
+<oliveagent-chat-summary>Chat 2</oliveagent-chat-summary>

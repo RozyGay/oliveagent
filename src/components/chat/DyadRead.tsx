@@ -2,13 +2,13 @@ import type React from "react";
 import type { ReactNode } from "react";
 import { FileText } from "lucide-react";
 
-interface DyadReadProps {
+interface OliveAgentReadProps {
   children?: ReactNode;
   node?: any;
   path?: string;
 }
 
-export const DyadRead: React.FC<DyadReadProps> = ({
+export const OliveAgentRead: React.FC<OliveAgentReadProps> = ({
   children,
   node,
   path: pathProp,

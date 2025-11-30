@@ -1,10 +1,10 @@
 Deleting a file
 
-<dyad-delete path="to-be-deleted.txt"></dyad-delete>
-<dyad-write path="new-file.js" description="new file">
+<oliveagent-delete path="to-be-deleted.txt"></oliveagent-delete>
+<oliveagent-write path="new-file.js" description="new file">
 new-file
 end of new-file
-</dyad-write>
-<dyad-write path="to-be-edited.txt" description="editing file">
+</oliveagent-write>
+<oliveagent-write path="to-be-edited.txt" description="editing file">
 after-edit
-</dyad-write>
+</oliveagent-write>

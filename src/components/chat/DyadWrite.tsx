@@ -16,14 +16,14 @@ import { FileEditor } from "../preview_panel/FileEditor";
 import { useAtomValue } from "jotai";
 import { selectedAppIdAtom } from "@/atoms/appAtoms";
 
-interface DyadWriteProps {
+interface OliveAgentWriteProps {
   children?: ReactNode;
   node?: any;
   path?: string;
   description?: string;
 }
 
-export const DyadWrite: React.FC<DyadWriteProps> = ({
+export const OliveAgentWrite: React.FC<OliveAgentWriteProps> = ({
   children,
   node,
   path: pathProp,

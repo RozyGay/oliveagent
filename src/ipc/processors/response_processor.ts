@@ -2,7 +2,7 @@ import { db } from "../../db";
 import { chats, messages } from "../../db/schema";
 import { and, eq } from "drizzle-orm";
 import fs from "node:fs";
-import { getDyadAppPath } from "../../paths/paths";
+import { getOliveAgentAppPath } from "../../paths/paths";
 import path from "node:path";
 import git from "isomorphic-git";
 import { safeJoin } from "../utils/path_utils";
@@ -20,13 +20,13 @@ import { gitCommit } from "../utils/git_utils";
 import { readSettings } from "@/main/settings";
 import { writeMigrationFile } from "../utils/file_utils";
 import {
-  getDyadWriteTags,
-  getDyadRenameTags,
-  getDyadDeleteTags,
-  getDyadAddDependencyTags,
-  getDyadExecuteSqlTags,
-  getDyadSearchReplaceTags,
-} from "../utils/dyad_tag_parser";
+  getOliveAgentWriteTags,
+  getOliveAgentRenameTags,
+  getOliveAgentDeleteTags,
+  getOliveAgentAddDependencyTags,
+  getOliveAgentExecuteSqlTags,
+  getOliveAgentSearchReplaceTags,
+} from "../utils/oliveagent_tag_parser";
 import { applySearchReplace } from "../../pro/main/ipc/processors/search_replace_processor";
 import { storeDbTimestampAtCurrentVersion } from "../utils/neon_timestamp_utils";
 
@@ -60,8 +60,8 @@ export async function dryRunSearchReplace({
   appPath: string;
 }) {
   const issues: { filePath: string; error: string }[] = [];
-  const dyadSearchReplaceTags = getDyadSearchReplaceTags(fullResponse);
-  for (const tag of dyadSearchReplaceTags) {
+  const oliveagentSearchReplaceTags = getOliveAgentSearchReplaceTags(fullResponse);
+  for (const tag of oliveagentSearchReplaceTags) {
     const filePath = tag.path;
     const fullFilePath = safeJoin(appPath, filePath);
     try {
@@ -142,7 +142,7 @@ export async function processFullResponseActions(
   }
 
   const settings: UserSettings = readSettings();
-  const appPath = getDyadAppPath(chatWithApp.app.path);
+  const appPath = getOliveAgentAppPath(chatWithApp.app.path);
   const writtenFiles: string[] = [];
   const renamedFiles: string[] = [];
   const deletedFiles: string[] = [];
@@ -153,12 +153,12 @@ export async function processFullResponseActions(
 
   try {
     // Extract all tags
-    const dyadWriteTags = getDyadWriteTags(fullResponse);
-    const dyadRenameTags = getDyadRenameTags(fullResponse);
-    const dyadDeletePaths = getDyadDeleteTags(fullResponse);
-    const dyadAddDependencyPackages = getDyadAddDependencyTags(fullResponse);
-    const dyadExecuteSqlQueries = chatWithApp.app.supabaseProjectId
-      ? getDyadExecuteSqlTags(fullResponse)
+    const oliveagentWriteTags = getOliveAgentWriteTags(fullResponse);
+    const oliveagentRenameTags = getOliveAgentRenameTags(fullResponse);
+    const oliveagentDeletePaths = getOliveAgentDeleteTags(fullResponse);
+    const oliveagentAddDependencyPackages = getOliveAgentAddDependencyTags(fullResponse);
+    const oliveagentExecuteSqlQueries = chatWithApp.app.supabaseProjectId
+      ? getOliveAgentExecuteSqlTags(fullResponse)
       : [];
 
     const message = await db.query.messages.findFirst({
@@ -175,8 +175,8 @@ export async function processFullResponseActions(
     }
 
     // Handle SQL execution tags
-    if (dyadExecuteSqlQueries.length > 0) {
-      for (const query of dyadExecuteSqlQueries) {
+    if (oliveagentExecuteSqlQueries.length > 0) {
+      for (const query of oliveagentExecuteSqlQueries) {
         try {
           await executeSupabaseSql({
             supabaseProjectId: chatWithApp.app.supabaseProjectId!,
@@ -206,20 +206,20 @@ export async function processFullResponseActions(
           });
         }
       }
-      logger.log(`Executed ${dyadExecuteSqlQueries.length} SQL queries`);
+      logger.log(`Executed ${oliveagentExecuteSqlQueries.length} SQL queries`);
     }
 
     // TODO: Handle add dependency tags
-    if (dyadAddDependencyPackages.length > 0) {
+    if (oliveagentAddDependencyPackages.length > 0) {
       try {
         await executeAddDependency({
-          packages: dyadAddDependencyPackages,
+          packages: oliveagentAddDependencyPackages,
           message: message,
           appPath,
         });
       } catch (error) {
         errors.push({
-          message: `Failed to add dependencies: ${dyadAddDependencyPackages.join(
+          message: `Failed to add dependencies: ${oliveagentAddDependencyPackages.join(
             ", ",
           )}`,
           error: error,
@@ -249,7 +249,7 @@ export async function processFullResponseActions(
     //////////////////////
 
     // Process all file deletions
-    for (const filePath of dyadDeletePaths) {
+    for (const filePath of oliveagentDeletePaths) {
       const fullFilePath = safeJoin(appPath, filePath);
 
       // Delete the file if it exists
@@ -292,7 +292,7 @@ export async function processFullResponseActions(
     }
 
     // Process all file renames
-    for (const tag of dyadRenameTags) {
+    for (const tag of oliveagentRenameTags) {
       const fromPath = safeJoin(appPath, tag.from);
       const toPath = safeJoin(appPath, tag.to);
 
@@ -355,20 +355,20 @@ export async function processFullResponseActions(
     }
 
     // Process all search-replace edits
-    const dyadSearchReplaceTags = getDyadSearchReplaceTags(fullResponse);
-    for (const tag of dyadSearchReplaceTags) {
+    const oliveagentSearchReplaceTags = getOliveAgentSearchReplaceTags(fullResponse);
+    for (const tag of oliveagentSearchReplaceTags) {
       const filePath = tag.path;
       const fullFilePath = safeJoin(appPath, filePath);
       try {
         if (!fs.existsSync(fullFilePath)) {
-          // Do not show warning to user because we already attempt to do a <dyad-write> tag to fix it.
+          // Do not show warning to user because we already attempt to do a <oliveagent-write> tag to fix it.
           logger.warn(`Search-replace target file does not exist: ${filePath}`);
           continue;
         }
         const original = await readFile(fullFilePath, "utf8");
         const result = applySearchReplace(original, tag.content);
         if (!result.success || typeof result.content !== "string") {
-          // Do not show warning to user because we already attempt to do a <dyad-write> and/or a subsequent <dyad-search-replace> tag to fix it.
+          // Do not show warning to user because we already attempt to do a <oliveagent-write> and/or a subsequent <oliveagent-search-replace> tag to fix it.
           logger.warn(
             `Failed to apply search-replace to ${filePath}: ${result.error ?? "unknown"}`,
           );
@@ -402,7 +402,7 @@ export async function processFullResponseActions(
     }
 
     // Process all file writes
-    for (const tag of dyadWriteTags) {
+    for (const tag of oliveagentWriteTags) {
       const filePath = tag.path;
       let content: string | Buffer = tag.content;
       const fullFilePath = safeJoin(appPath, filePath);
@@ -460,7 +460,7 @@ export async function processFullResponseActions(
       writtenFiles.length > 0 ||
       renamedFiles.length > 0 ||
       deletedFiles.length > 0 ||
-      dyadAddDependencyPackages.length > 0;
+      oliveagentAddDependencyPackages.length > 0;
 
     let uncommittedFiles: string[] = [];
     let extraFilesError: string | undefined;
@@ -483,16 +483,16 @@ export async function processFullResponseActions(
         changes.push(`renamed ${renamedFiles.length} file(s)`);
       if (deletedFiles.length > 0)
         changes.push(`deleted ${deletedFiles.length} file(s)`);
-      if (dyadAddDependencyPackages.length > 0)
+      if (oliveagentAddDependencyPackages.length > 0)
         changes.push(
-          `added ${dyadAddDependencyPackages.join(", ")} package(s)`,
+          `added ${oliveagentAddDependencyPackages.join(", ")} package(s)`,
         );
-      if (dyadExecuteSqlQueries.length > 0)
-        changes.push(`executed ${dyadExecuteSqlQueries.length} SQL queries`);
+      if (oliveagentExecuteSqlQueries.length > 0)
+        changes.push(`executed ${oliveagentExecuteSqlQueries.length} SQL queries`);
 
       let message = chatSummary
-        ? `[dyad] ${chatSummary} - ${changes.join(", ")}`
-        : `[dyad] ${changes.join(", ")}`;
+        ? `[oliveagent] ${chatSummary} - ${changes.join(", ")}`
+        : `[oliveagent] ${changes.join(", ")}`;
       // Use chat summary, if provided, or default for commit message
       let commitHash = await gitCommit({
         path: appPath,
@@ -516,17 +516,17 @@ export async function processFullResponseActions(
         try {
           commitHash = await gitCommit({
             path: appPath,
-            message: message + " + extra files edited outside of Dyad",
+            message: message + " + extra files edited outside of OliveAgent",
             amend: true,
           });
           logger.log(
-            `Amend commit with changes outside of dyad: ${uncommittedFiles.join(", ")}`,
+            `Amend commit with changes outside of oliveagent: ${uncommittedFiles.join(", ")}`,
           );
         } catch (error) {
           // Just log, but don't throw an error because the user can still
-          // commit these changes outside of Dyad if needed.
+          // commit these changes outside of OliveAgent if needed.
           logger.error(
-            `Failed to commit changes outside of dyad: ${uncommittedFiles.join(
+            `Failed to commit changes outside of oliveagent: ${uncommittedFiles.join(
               ", ",
             )}`,
           );
@@ -564,13 +564,13 @@ export async function processFullResponseActions(
     ${warnings
       .map(
         (warning) =>
-          `<dyad-output type="warning" message="${warning.message}">${warning.error}</dyad-output>`,
+          `<oliveagent-output type="warning" message="${warning.message}">${warning.error}</oliveagent-output>`,
       )
       .join("\n")}
     ${errors
       .map(
         (error) =>
-          `<dyad-output type="error" message="${error.message}">${error.error}</dyad-output>`,
+          `<oliveagent-output type="error" message="${error.message}">${error.error}</oliveagent-output>`,
       )
       .join("\n")}
     `;

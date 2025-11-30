@@ -45,7 +45,7 @@ export function registerSupabaseHandlers() {
     },
   );
 
-  // Set app project - links a Dyad app to a Supabase project
+  // Set app project - links a OliveAgent app to a Supabase project
   handle(
     "supabase:set-app-project",
     async (
@@ -66,7 +66,7 @@ export function registerSupabaseHandlers() {
     },
   );
 
-  // Unset app project - removes the link between a Dyad app and a Supabase project
+  // Unset app project - removes the link between a OliveAgent app and a Supabase project
   handle("supabase:unset-app-project", async (_, { app }: { app: number }) => {
     await db
       .update(apps)
@@ -106,7 +106,7 @@ export function registerSupabaseHandlers() {
       // Simulate the deep link event
       safeSend(event.sender, "deep-link-received", {
         type: "supabase-oauth-return",
-        url: "https://supabase-oauth.dyad.sh/api/connect-supabase/login",
+        url: "https://supabase-oauth.oliveagent.sh/api/connect-supabase/login",
       });
       logger.info(
         `Sent fake deep-link-received event for app ${appId} during testing.`,

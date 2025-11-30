@@ -7,13 +7,13 @@ import { IpcClient } from "../../ipc/ipc_client";
 import { Package, ChevronsUpDown, ChevronsDownUp } from "lucide-react";
 import { CodeHighlight } from "./CodeHighlight";
 
-interface DyadAddDependencyProps {
+interface OliveAgentAddDependencyProps {
   children?: ReactNode;
   node?: any;
   packages?: string;
 }
 
-export const DyadAddDependency: React.FC<DyadAddDependencyProps> = ({
+export const OliveAgentAddDependency: React.FC<OliveAgentAddDependencyProps> = ({
   children,
   node,
 }) => {

@@ -2,21 +2,21 @@ import { normalizePath } from "../../../shared/normalizePath";
 import log from "electron-log";
 import { SqlQuery } from "../../lib/schemas";
 
-const logger = log.scope("dyad_tag_parser");
+const logger = log.scope("oliveagent_tag_parser");
 
-export function getDyadWriteTags(fullResponse: string): {
+export function getOliveAgentWriteTags(fullResponse: string): {
   path: string;
   content: string;
   description?: string;
 }[] {
-  const dyadWriteRegex = /<dyad-write([^>]*)>([\s\S]*?)<\/dyad-write>/gi;
+  const oliveagentWriteRegex = /<oliveagent-write([^>]*)>([\s\S]*?)<\/oliveagent-write>/gi;
   const pathRegex = /path="([^"]+)"/;
   const descriptionRegex = /description="([^"]+)"/;
 
   let match;
   const tags: { path: string; content: string; description?: string }[] = [];
 
-  while ((match = dyadWriteRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentWriteRegex.exec(fullResponse)) !== null) {
     const attributesString = match[1];
     let content = match[2].trim();
 
@@ -39,7 +39,7 @@ export function getDyadWriteTags(fullResponse: string): {
       tags.push({ path: normalizePath(path), content, description });
     } else {
       logger.warn(
-        "Found <dyad-write> tag without a valid 'path' attribute:",
+        "Found <oliveagent-write> tag without a valid 'path' attribute:",
         match[0],
       );
     }
@@ -47,15 +47,15 @@ export function getDyadWriteTags(fullResponse: string): {
   return tags;
 }
 
-export function getDyadRenameTags(fullResponse: string): {
+export function getOliveAgentRenameTags(fullResponse: string): {
   from: string;
   to: string;
 }[] {
-  const dyadRenameRegex =
-    /<dyad-rename from="([^"]+)" to="([^"]+)"[^>]*>([\s\S]*?)<\/dyad-rename>/g;
+  const oliveagentRenameRegex =
+    /<oliveagent-rename from="([^"]+)" to="([^"]+)"[^>]*>([\s\S]*?)<\/oliveagent-rename>/g;
   let match;
   const tags: { from: string; to: string }[] = [];
-  while ((match = dyadRenameRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentRenameRegex.exec(fullResponse)) !== null) {
     tags.push({
       from: normalizePath(match[1]),
       to: normalizePath(match[2]),
@@ -64,46 +64,46 @@ export function getDyadRenameTags(fullResponse: string): {
   return tags;
 }
 
-export function getDyadDeleteTags(fullResponse: string): string[] {
-  const dyadDeleteRegex =
-    /<dyad-delete path="([^"]+)"[^>]*>([\s\S]*?)<\/dyad-delete>/g;
+export function getOliveAgentDeleteTags(fullResponse: string): string[] {
+  const oliveagentDeleteRegex =
+    /<oliveagent-delete path="([^"]+)"[^>]*>([\s\S]*?)<\/oliveagent-delete>/g;
   let match;
   const paths: string[] = [];
-  while ((match = dyadDeleteRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentDeleteRegex.exec(fullResponse)) !== null) {
     paths.push(normalizePath(match[1]));
   }
   return paths;
 }
 
-export function getDyadAddDependencyTags(fullResponse: string): string[] {
-  const dyadAddDependencyRegex =
-    /<dyad-add-dependency packages="([^"]+)">[^<]*<\/dyad-add-dependency>/g;
+export function getOliveAgentAddDependencyTags(fullResponse: string): string[] {
+  const oliveagentAddDependencyRegex =
+    /<oliveagent-add-dependency packages="([^"]+)">[^<]*<\/oliveagent-add-dependency>/g;
   let match;
   const packages: string[] = [];
-  while ((match = dyadAddDependencyRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentAddDependencyRegex.exec(fullResponse)) !== null) {
     packages.push(...match[1].split(" "));
   }
   return packages;
 }
 
-export function getDyadChatSummaryTag(fullResponse: string): string | null {
-  const dyadChatSummaryRegex =
-    /<dyad-chat-summary>([\s\S]*?)<\/dyad-chat-summary>/g;
-  const match = dyadChatSummaryRegex.exec(fullResponse);
+export function getOliveAgentChatSummaryTag(fullResponse: string): string | null {
+  const oliveagentChatSummaryRegex =
+    /<oliveagent-chat-summary>([\s\S]*?)<\/oliveagent-chat-summary>/g;
+  const match = oliveagentChatSummaryRegex.exec(fullResponse);
   if (match && match[1]) {
     return match[1].trim();
   }
   return null;
 }
 
-export function getDyadExecuteSqlTags(fullResponse: string): SqlQuery[] {
-  const dyadExecuteSqlRegex =
-    /<dyad-execute-sql([^>]*)>([\s\S]*?)<\/dyad-execute-sql>/g;
+export function getOliveAgentExecuteSqlTags(fullResponse: string): SqlQuery[] {
+  const oliveagentExecuteSqlRegex =
+    /<oliveagent-execute-sql([^>]*)>([\s\S]*?)<\/oliveagent-execute-sql>/g;
   const descriptionRegex = /description="([^"]+)"/;
   let match;
   const queries: { content: string; description?: string }[] = [];
 
-  while ((match = dyadExecuteSqlRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentExecuteSqlRegex.exec(fullResponse)) !== null) {
     const attributesString = match[1] || "";
     let content = match[2].trim();
     const descriptionMatch = descriptionRegex.exec(attributesString);
@@ -125,33 +125,33 @@ export function getDyadExecuteSqlTags(fullResponse: string): SqlQuery[] {
   return queries;
 }
 
-export function getDyadCommandTags(fullResponse: string): string[] {
-  const dyadCommandRegex =
-    /<dyad-command type="([^"]+)"[^>]*><\/dyad-command>/g;
+export function getOliveAgentCommandTags(fullResponse: string): string[] {
+  const oliveagentCommandRegex =
+    /<oliveagent-command type="([^"]+)"[^>]*><\/oliveagent-command>/g;
   let match;
   const commands: string[] = [];
 
-  while ((match = dyadCommandRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentCommandRegex.exec(fullResponse)) !== null) {
     commands.push(match[1]);
   }
 
   return commands;
 }
 
-export function getDyadSearchReplaceTags(fullResponse: string): {
+export function getOliveAgentSearchReplaceTags(fullResponse: string): {
   path: string;
   content: string;
   description?: string;
 }[] {
-  const dyadSearchReplaceRegex =
-    /<dyad-search-replace([^>]*)>([\s\S]*?)<\/dyad-search-replace>/gi;
+  const oliveagentSearchReplaceRegex =
+    /<oliveagent-search-replace([^>]*)>([\s\S]*?)<\/oliveagent-search-replace>/gi;
   const pathRegex = /path="([^"]+)"/;
   const descriptionRegex = /description="([^"]+)"/;
 
   let match;
   const tags: { path: string; content: string; description?: string }[] = [];
 
-  while ((match = dyadSearchReplaceRegex.exec(fullResponse)) !== null) {
+  while ((match = oliveagentSearchReplaceRegex.exec(fullResponse)) !== null) {
     const attributesString = match[1] || "";
     let content = match[2].trim();
 
@@ -175,7 +175,7 @@ export function getDyadSearchReplaceTags(fullResponse: string): {
       tags.push({ path: normalizePath(path), content, description });
     } else {
       logger.warn(
-        "Found <dyad-search-replace> tag without a valid 'path' attribute:",
+        "Found <oliveagent-search-replace> tag without a valid 'path' attribute:",
         match[0],
       );
     }

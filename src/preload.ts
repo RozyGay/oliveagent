@@ -108,7 +108,7 @@ const validInvokeChannels = [
   "open-ios",
   "open-android",
   "check-problems",
-  "restart-dyad",
+  "restart-oliveagent",
   "get-templates",
   "portal:migrate-create",
   // MCP

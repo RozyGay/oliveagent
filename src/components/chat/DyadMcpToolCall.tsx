@@ -2,12 +2,12 @@ import React, { useMemo, useState } from "react";
 import { Wrench, ChevronsUpDown, ChevronsDownUp } from "lucide-react";
 import { CodeHighlight } from "./CodeHighlight";
 
-interface DyadMcpToolCallProps {
+interface OliveAgentMcpToolCallProps {
   node?: any;
   children?: React.ReactNode;
 }
 
-export const DyadMcpToolCall: React.FC<DyadMcpToolCallProps> = ({
+export const OliveAgentMcpToolCall: React.FC<OliveAgentMcpToolCallProps> = ({
   node,
   children,
 }) => {
@@ -23,7 +23,7 @@ export const DyadMcpToolCall: React.FC<DyadMcpToolCallProps> = ({
       const parsed = JSON.parse(raw);
       return JSON.stringify(parsed, null, 2);
     } catch (e) {
-      console.error("Error parsing JSON for dyad-mcp-tool-call", e);
+      console.error("Error parsing JSON for oliveagent-mcp-tool-call", e);
       return raw;
     }
   }, [expanded, raw]);

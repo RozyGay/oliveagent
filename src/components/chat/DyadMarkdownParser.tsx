@@ -1,35 +1,35 @@
 import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 
-import { DyadWrite } from "./DyadWrite";
-import { DyadRename } from "./DyadRename";
-import { DyadDelete } from "./DyadDelete";
-import { DyadAddDependency } from "./DyadAddDependency";
-import { DyadExecuteSql } from "./DyadExecuteSql";
-import { DyadAddIntegration } from "./DyadAddIntegration";
-import { DyadEdit } from "./DyadEdit";
-import { DyadSearchReplace } from "./DyadSearchReplace";
-import { DyadCodebaseContext } from "./DyadCodebaseContext";
-import { DyadThink } from "./DyadThink";
+import { OliveAgentWrite } from "./OliveAgentWrite";
+import { OliveAgentRename } from "./OliveAgentRename";
+import { OliveAgentDelete } from "./OliveAgentDelete";
+import { OliveAgentAddDependency } from "./OliveAgentAddDependency";
+import { OliveAgentExecuteSql } from "./OliveAgentExecuteSql";
+import { OliveAgentAddIntegration } from "./OliveAgentAddIntegration";
+import { OliveAgentEdit } from "./OliveAgentEdit";
+import { OliveAgentSearchReplace } from "./OliveAgentSearchReplace";
+import { OliveAgentCodebaseContext } from "./OliveAgentCodebaseContext";
+import { OliveAgentThink } from "./OliveAgentThink";
 import { CodeHighlight } from "./CodeHighlight";
 import { useAtomValue } from "jotai";
 import { isStreamingByIdAtom, selectedChatIdAtom } from "@/atoms/chatAtoms";
 import { CustomTagState } from "./stateTypes";
-import { DyadOutput } from "./DyadOutput";
-import { DyadProblemSummary } from "./DyadProblemSummary";
+import { OliveAgentOutput } from "./OliveAgentOutput";
+import { OliveAgentProblemSummary } from "./OliveAgentProblemSummary";
 import { IpcClient } from "@/ipc/ipc_client";
-import { DyadMcpToolCall } from "./DyadMcpToolCall";
-import { DyadMcpToolResult } from "./DyadMcpToolResult";
-import { DyadWebSearchResult } from "./DyadWebSearchResult";
-import { DyadWebSearch } from "./DyadWebSearch";
-import { DyadWebCrawl } from "./DyadWebCrawl";
-import { DyadCodeSearchResult } from "./DyadCodeSearchResult";
-import { DyadCodeSearch } from "./DyadCodeSearch";
-import { DyadRead } from "./DyadRead";
+import { OliveAgentMcpToolCall } from "./OliveAgentMcpToolCall";
+import { OliveAgentMcpToolResult } from "./OliveAgentMcpToolResult";
+import { OliveAgentWebSearchResult } from "./OliveAgentWebSearchResult";
+import { OliveAgentWebSearch } from "./OliveAgentWebSearch";
+import { OliveAgentWebCrawl } from "./OliveAgentWebCrawl";
+import { OliveAgentCodeSearchResult } from "./OliveAgentCodeSearchResult";
+import { OliveAgentCodeSearch } from "./OliveAgentCodeSearch";
+import { OliveAgentRead } from "./OliveAgentRead";
 import { mapActionToButton } from "./ChatInput";
 import { SuggestedAction } from "@/lib/schemas";
 
-interface DyadMarkdownParserProps {
+interface OliveAgentMarkdownParserProps {
   content: string;
 }
 
@@ -78,9 +78,9 @@ export const VanillaMarkdownParser = ({ content }: { content: string }) => {
 };
 
 /**
- * Custom component to parse markdown content with Dyad-specific tags
+ * Custom component to parse markdown content with OliveAgent-specific tags
  */
-export const DyadMarkdownParser: React.FC<DyadMarkdownParserProps> = ({
+export const OliveAgentMarkdownParser: React.FC<OliveAgentMarkdownParserProps> = ({
   content,
 }) => {
   const chatId = useAtomValue(selectedChatIdAtom);
@@ -123,26 +123,26 @@ function preprocessUnclosedTags(content: string): {
   inProgressTags: Map<string, Set<number>>;
 } {
   const customTagNames = [
-    "dyad-write",
-    "dyad-rename",
-    "dyad-delete",
-    "dyad-add-dependency",
-    "dyad-execute-sql",
-    "dyad-add-integration",
-    "dyad-output",
-    "dyad-problem-report",
-    "dyad-chat-summary",
-    "dyad-edit",
-    "dyad-search-replace",
-    "dyad-codebase-context",
-    "dyad-web-search-result",
-    "dyad-web-search",
-    "dyad-web-crawl",
-    "dyad-read",
+    "oliveagent-write",
+    "oliveagent-rename",
+    "oliveagent-delete",
+    "oliveagent-add-dependency",
+    "oliveagent-execute-sql",
+    "oliveagent-add-integration",
+    "oliveagent-output",
+    "oliveagent-problem-report",
+    "oliveagent-chat-summary",
+    "oliveagent-edit",
+    "oliveagent-search-replace",
+    "oliveagent-codebase-context",
+    "oliveagent-web-search-result",
+    "oliveagent-web-search",
+    "oliveagent-web-crawl",
+    "oliveagent-read",
     "think",
-    "dyad-command",
-    "dyad-mcp-tool-call",
-    "dyad-mcp-tool-result",
+    "oliveagent-command",
+    "oliveagent-mcp-tool-call",
+    "oliveagent-mcp-tool-result",
   ];
 
   let processedContent = content;
@@ -197,28 +197,28 @@ function parseCustomTags(content: string): ContentPiece[] {
   const { processedContent, inProgressTags } = preprocessUnclosedTags(content);
 
   const customTagNames = [
-    "dyad-write",
-    "dyad-rename",
-    "dyad-delete",
-    "dyad-add-dependency",
-    "dyad-execute-sql",
-    "dyad-add-integration",
-    "dyad-output",
-    "dyad-problem-report",
-    "dyad-chat-summary",
-    "dyad-edit",
-    "dyad-search-replace",
-    "dyad-codebase-context",
-    "dyad-web-search-result",
-    "dyad-web-search",
-    "dyad-web-crawl",
-    "dyad-code-search-result",
-    "dyad-code-search",
-    "dyad-read",
+    "oliveagent-write",
+    "oliveagent-rename",
+    "oliveagent-delete",
+    "oliveagent-add-dependency",
+    "oliveagent-execute-sql",
+    "oliveagent-add-integration",
+    "oliveagent-output",
+    "oliveagent-problem-report",
+    "oliveagent-chat-summary",
+    "oliveagent-edit",
+    "oliveagent-search-replace",
+    "oliveagent-codebase-context",
+    "oliveagent-web-search-result",
+    "oliveagent-web-search",
+    "oliveagent-web-crawl",
+    "oliveagent-code-search-result",
+    "oliveagent-code-search",
+    "oliveagent-read",
     "think",
-    "dyad-command",
-    "dyad-mcp-tool-call",
-    "dyad-mcp-tool-result",
+    "oliveagent-command",
+    "oliveagent-mcp-tool-call",
+    "oliveagent-mcp-tool-result",
   ];
 
   const tagPattern = new RegExp(
@@ -304,9 +304,9 @@ function renderCustomTag(
   const { tag, attributes, content, inProgress } = tagInfo;
 
   switch (tag) {
-    case "dyad-read":
+    case "oliveagent-read":
       return (
-        <DyadRead
+        <OliveAgentRead
           node={{
             properties: {
               path: attributes.path || "",
@@ -314,51 +314,51 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadRead>
+        </OliveAgentRead>
       );
-    case "dyad-web-search":
+    case "oliveagent-web-search":
       return (
-        <DyadWebSearch
+        <OliveAgentWebSearch
           node={{
             properties: {},
           }}
         >
           {content}
-        </DyadWebSearch>
+        </OliveAgentWebSearch>
       );
-    case "dyad-web-crawl":
+    case "oliveagent-web-crawl":
       return (
-        <DyadWebCrawl
+        <OliveAgentWebCrawl
           node={{
             properties: {},
           }}
         >
           {content}
-        </DyadWebCrawl>
+        </OliveAgentWebCrawl>
       );
-    case "dyad-code-search":
+    case "oliveagent-code-search":
       return (
-        <DyadCodeSearch
+        <OliveAgentCodeSearch
           node={{
             properties: {},
           }}
         >
           {content}
-        </DyadCodeSearch>
+        </OliveAgentCodeSearch>
       );
-    case "dyad-code-search-result":
+    case "oliveagent-code-search-result":
       return (
-        <DyadCodeSearchResult
+        <OliveAgentCodeSearchResult
           node={{
             properties: {},
           }}
         >
           {content}
-        </DyadCodeSearchResult>
+        </OliveAgentCodeSearchResult>
       );
-    case "dyad-web-search-result":
+    case "oliveagent-web-search-result":
       return (
-        <DyadWebSearchResult
+        <OliveAgentWebSearchResult
           node={{
             properties: {
               state: getState({ isStreaming, inProgress }),
@@ -366,11 +366,11 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadWebSearchResult>
+        </OliveAgentWebSearchResult>
       );
     case "think":
       return (
-        <DyadThink
+        <OliveAgentThink
           node={{
             properties: {
               state: getState({ isStreaming, inProgress }),
@@ -378,11 +378,11 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadThink>
+        </OliveAgentThink>
       );
-    case "dyad-write":
+    case "oliveagent-write":
       return (
-        <DyadWrite
+        <OliveAgentWrite
           node={{
             properties: {
               path: attributes.path || "",
@@ -392,12 +392,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadWrite>
+        </OliveAgentWrite>
       );
 
-    case "dyad-rename":
+    case "oliveagent-rename":
       return (
-        <DyadRename
+        <OliveAgentRename
           node={{
             properties: {
               from: attributes.from || "",
@@ -406,12 +406,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadRename>
+        </OliveAgentRename>
       );
 
-    case "dyad-delete":
+    case "oliveagent-delete":
       return (
-        <DyadDelete
+        <OliveAgentDelete
           node={{
             properties: {
               path: attributes.path || "",
@@ -419,12 +419,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadDelete>
+        </OliveAgentDelete>
       );
 
-    case "dyad-add-dependency":
+    case "oliveagent-add-dependency":
       return (
-        <DyadAddDependency
+        <OliveAgentAddDependency
           node={{
             properties: {
               packages: attributes.packages || "",
@@ -432,12 +432,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadAddDependency>
+        </OliveAgentAddDependency>
       );
 
-    case "dyad-execute-sql":
+    case "oliveagent-execute-sql":
       return (
-        <DyadExecuteSql
+        <OliveAgentExecuteSql
           node={{
             properties: {
               state: getState({ isStreaming, inProgress }),
@@ -446,12 +446,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadExecuteSql>
+        </OliveAgentExecuteSql>
       );
 
-    case "dyad-add-integration":
+    case "oliveagent-add-integration":
       return (
-        <DyadAddIntegration
+        <OliveAgentAddIntegration
           node={{
             properties: {
               provider: attributes.provider || "",
@@ -459,12 +459,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadAddIntegration>
+        </OliveAgentAddIntegration>
       );
 
-    case "dyad-edit":
+    case "oliveagent-edit":
       return (
-        <DyadEdit
+        <OliveAgentEdit
           node={{
             properties: {
               path: attributes.path || "",
@@ -474,12 +474,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadEdit>
+        </OliveAgentEdit>
       );
 
-    case "dyad-search-replace":
+    case "oliveagent-search-replace":
       return (
-        <DyadSearchReplace
+        <OliveAgentSearchReplace
           node={{
             properties: {
               path: attributes.path || "",
@@ -489,12 +489,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadSearchReplace>
+        </OliveAgentSearchReplace>
       );
 
-    case "dyad-codebase-context":
+    case "oliveagent-codebase-context":
       return (
-        <DyadCodebaseContext
+        <OliveAgentCodebaseContext
           node={{
             properties: {
               files: attributes.files || "",
@@ -503,12 +503,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadCodebaseContext>
+        </OliveAgentCodebaseContext>
       );
 
-    case "dyad-mcp-tool-call":
+    case "oliveagent-mcp-tool-call":
       return (
-        <DyadMcpToolCall
+        <OliveAgentMcpToolCall
           node={{
             properties: {
               serverName: attributes.server || "",
@@ -517,12 +517,12 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadMcpToolCall>
+        </OliveAgentMcpToolCall>
       );
 
-    case "dyad-mcp-tool-result":
+    case "oliveagent-mcp-tool-result":
       return (
-        <DyadMcpToolResult
+        <OliveAgentMcpToolResult
           node={{
             properties: {
               serverName: attributes.server || "",
@@ -531,31 +531,31 @@ function renderCustomTag(
           }}
         >
           {content}
-        </DyadMcpToolResult>
+        </OliveAgentMcpToolResult>
       );
 
-    case "dyad-output":
+    case "oliveagent-output":
       return (
-        <DyadOutput
+        <OliveAgentOutput
           type={attributes.type as "warning" | "error"}
           message={attributes.message}
         >
           {content}
-        </DyadOutput>
+        </OliveAgentOutput>
       );
 
-    case "dyad-problem-report":
+    case "oliveagent-problem-report":
       return (
-        <DyadProblemSummary summary={attributes.summary}>
+        <OliveAgentProblemSummary summary={attributes.summary}>
           {content}
-        </DyadProblemSummary>
+        </OliveAgentProblemSummary>
       );
 
-    case "dyad-chat-summary":
-      // Don't render anything for dyad-chat-summary
+    case "oliveagent-chat-summary":
+      // Don't render anything for oliveagent-chat-summary
       return null;
 
-    case "dyad-command":
+    case "oliveagent-command":
       if (attributes.type) {
         const action = {
           id: attributes.type,

@@ -1,6 +1,6 @@
-<dyad-rename from="src/App.tsx" to="src/Renamed.tsx">
-</dyad-rename>
+<oliveagent-rename from="src/App.tsx" to="src/Renamed.tsx">
+</oliveagent-rename>
 
-<dyad-write path="src/Renamed.tsx">
+<oliveagent-write path="src/Renamed.tsx">
 // newly added content to renamed file should exist
-</dyad-write>
+</oliveagent-write>

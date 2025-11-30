@@ -2,13 +2,13 @@ import type React from "react";
 import type { ReactNode } from "react";
 import { FileCode } from "lucide-react";
 
-interface DyadCodeSearchProps {
+interface OliveAgentCodeSearchProps {
   children?: ReactNode;
   node?: any;
   query?: string;
 }
 
-export const DyadCodeSearch: React.FC<DyadCodeSearchProps> = ({
+export const OliveAgentCodeSearch: React.FC<OliveAgentCodeSearchProps> = ({
   children,
   node: _node,
   query: queryProp,

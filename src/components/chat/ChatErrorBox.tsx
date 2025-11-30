@@ -11,11 +11,11 @@ import remarkGfm from "remark-gfm";
 export function ChatErrorBox({
   onDismiss,
   error,
-  isDyadProEnabled,
+  isOliveAgentProEnabled,
 }: {
   onDismiss: () => void;
   error: string;
-  isDyadProEnabled: boolean;
+  isOliveAgentProEnabled: boolean;
 }) {
   if (error.includes("doesn't have a free quota tier")) {
     return (
@@ -23,10 +23,10 @@ export function ChatErrorBox({
         {error}
         <span className="ml-1">
           <ExternalLink
-            href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=free-quota-error"
+            href="https://oliveagent.sh/pro?utm_source=oliveagent-app&utm_medium=app&utm_campaign=free-quota-error"
             variant="primary"
           >
-            Access with Dyad Pro
+            Access with OliveAgent Pro
           </ExternalLink>
         </span>{" "}
         or switch to another model.
@@ -46,13 +46,13 @@ export function ChatErrorBox({
         {error}
         <div className="mt-2 space-y-2 space-x-2">
           <ExternalLink
-            href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=rate-limit-error"
+            href="https://oliveagent.sh/pro?utm_source=oliveagent-app&utm_medium=app&utm_campaign=rate-limit-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to OliveAgent Pro
           </ExternalLink>
 
-          <ExternalLink href="https://dyad.sh/docs/help/ai-rate-limit">
+          <ExternalLink href="https://oliveagent.sh/docs/help/ai-rate-limit">
             Troubleshooting guide
           </ExternalLink>
         </div>
@@ -64,25 +64,25 @@ export function ChatErrorBox({
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          Looks like you don't have a valid Dyad Pro key.{" "}
+          Looks like you don't have a valid OliveAgent Pro key.{" "}
           <ExternalLink
-            href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=invalid-pro-key-error"
+            href="https://oliveagent.sh/pro?utm_source=oliveagent-app&utm_medium=app&utm_campaign=invalid-pro-key-error"
             variant="primary"
           >
-            Upgrade to Dyad Pro
+            Upgrade to OliveAgent Pro
           </ExternalLink>{" "}
           today.
         </span>
       </ChatInfoContainer>
     );
   }
-  if (isDyadProEnabled && error.includes("ExceededBudget:")) {
+  if (isOliveAgentProEnabled && error.includes("ExceededBudget:")) {
     return (
       <ChatInfoContainer onDismiss={onDismiss}>
         <span>
-          You have used all of your Dyad AI credits this month.{" "}
+          You have used all of your OliveAgent AI credits this month.{" "}
           <ExternalLink
-            href="https://academy.dyad.sh/subscription?utm_source=dyad-app&utm_medium=app&utm_campaign=exceeded-budget-error"
+            href="https://academy.oliveagent.sh/subscription?utm_source=oliveagent-app&utm_medium=app&utm_campaign=exceeded-budget-error"
             variant="primary"
           >
             Reload or upgrade your subscription
@@ -100,17 +100,17 @@ export function ChatErrorBox({
     <ChatErrorContainer onDismiss={onDismiss}>
       {error}
       <div className="mt-2 space-y-2 space-x-2">
-        {!isDyadProEnabled &&
+        {!isOliveAgentProEnabled &&
           error.includes(AI_STREAMING_ERROR_MESSAGE_PREFIX) &&
           !error.includes("TypeError: terminated") && (
             <ExternalLink
-              href="https://dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=general-error"
+              href="https://oliveagent.sh/pro?utm_source=oliveagent-app&utm_medium=app&utm_campaign=general-error"
               variant="primary"
             >
-              Upgrade to Dyad Pro
+              Upgrade to OliveAgent Pro
             </ExternalLink>
           )}
-        <ExternalLink href="https://www.dyad.sh/docs/faq">
+        <ExternalLink href="https://www.oliveagent.sh/docs/faq">
           Read docs
         </ExternalLink>
       </div>

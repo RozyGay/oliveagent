@@ -9,9 +9,9 @@ const VALID_EXTENSIONS = new Set([".jsx", ".tsx"]);
 /**
  * Returns a Vite / esbuild plug-in.
  */
-export default function dyadTagger(): Plugin {
+export default function oliveagentTagger(): Plugin {
   return {
-    name: "vite-plugin-dyad-tagger",
+    name: "vite-plugin-oliveagent-tagger",
     apply: "serve",
     enforce: "pre",
 
@@ -42,29 +42,29 @@ export default function dyadTagger(): Plugin {
               const tagName = node.name.name as string;
               if (!tagName) return;
 
-              // ── 2. Check whether the tag already has data-dyad-id ───────────────
+              // ── 2. Check whether the tag already has data-oliveagent-id ───────────────
               const alreadyTagged = node.attributes?.some(
                 (attr: any) =>
                   attr.type === "JSXAttribute" &&
-                  attr.name?.name === "data-dyad-id",
+                  attr.name?.name === "data-oliveagent-id",
               );
               if (alreadyTagged) return;
 
               // ── 3. Build the id "relative/file.jsx:line:column" ─────────────────
               const loc = node.loc?.start;
               if (!loc) return;
-              const dyadId = `${fileRelative}:${loc.line}:${loc.column}`;
+              const oliveagentId = `${fileRelative}:${loc.line}:${loc.column}`;
 
               // ── 4. Inject the attributes just after the tag name ────────────────
               if (node.name.end != null) {
                 ms.appendLeft(
                   node.name.end,
-                  ` data-dyad-id="${dyadId}" data-dyad-name="${tagName}"`,
+                  ` data-oliveagent-id="${oliveagentId}" data-oliveagent-name="${tagName}"`,
                 );
               }
             } catch (error) {
               console.warn(
-                `[dyad-tagger] Warning: Failed to process JSX node in ${id}:`,
+                `[oliveagent-tagger] Warning: Failed to process JSX node in ${id}:`,
                 error,
               );
             }
@@ -80,7 +80,7 @@ export default function dyadTagger(): Plugin {
         };
       } catch (error) {
         console.warn(
-          `[dyad-tagger] Warning: Failed to transform ${id}:`,
+          `[oliveagent-tagger] Warning: Failed to transform ${id}:`,
           error,
         );
         return null;

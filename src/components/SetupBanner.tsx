@@ -114,10 +114,10 @@ export function SetupBanner() {
       params: { provider: "openrouter" },
     });
   };
-  const handleDyadProSetupClick = () => {
-    posthog.capture("setup-flow:ai-provider-setup:dyad:click");
+  const handleOliveAgentProSetupClick = () => {
+    posthog.capture("setup-flow:ai-provider-setup:oliveagent:click");
     IpcClient.getInstance().openExternalUrl(
-      "https://www.dyad.sh/pro?utm_source=dyad-app&utm_medium=app&utm_campaign=setup-banner",
+      "https://www.oliveagent.sh/pro?utm_source=oliveagent-app&utm_medium=app&utm_campaign=setup-banner",
     );
   };
 
@@ -178,7 +178,7 @@ export function SetupBanner() {
   return (
     <>
       <p className="text-xl font-medium text-zinc-700 dark:text-zinc-300 p-4">
-        Setup Dyad
+        Setup OliveAgent
       </p>
       <OnboardingBanner
         isVisible={isOnboardingVisible}
@@ -343,13 +343,13 @@ export function SetupBanner() {
 
               <SetupProviderCard
                 className="mt-2"
-                variant="dyad"
-                onClick={handleDyadProSetupClick}
+                variant="oliveagent"
+                onClick={handleOliveAgentProSetupClick}
                 tabIndex={isNodeSetupComplete ? 0 : -1}
                 leadingIcon={
-                  <img src={logo} alt="Dyad Logo" className="w-6 h-6 mr-0.5" />
+                  <img src={logo} alt="OliveAgent Logo" className="w-6 h-6 mr-0.5" />
                 }
-                title="Setup Dyad Pro"
+                title="Setup OliveAgent Pro"
                 subtitle="Access all AI models with one plan"
                 chip={<>Recommended</>}
               />
@@ -393,7 +393,7 @@ function NodeJsHelpCallout() {
         <a
           onClick={() => {
             IpcClient.getInstance().openExternalUrl(
-              "https://www.dyad.sh/docs/help/nodejs",
+              "https://www.oliveagent.sh/docs/help/nodejs",
             );
           }}
           className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
@@ -446,7 +446,7 @@ function NodeInstallButton({
     case "finished-checking":
       return (
         <div className="mt-3 text-sm text-red-600 dark:text-red-400">
-          Node.js not detected. Closing and re-opening Dyad usually fixes this.
+          Node.js not detected. Closing and re-opening OliveAgent usually fixes this.
         </div>
       );
     default:

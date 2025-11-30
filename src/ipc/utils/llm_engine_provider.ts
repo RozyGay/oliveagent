@@ -38,7 +38,7 @@ or to provide a custom fetch implementation for e.g. testing.
   fetch?: FetchFunction;
 
   originalProviderId: string;
-  dyadOptions: {
+  oliveagentOptions: {
     enableLazyEdits?: boolean;
     enableSmartFilesContext?: boolean;
     enableWebSearch?: boolean;
@@ -47,7 +47,7 @@ or to provide a custom fetch implementation for e.g. testing.
   settings: UserSettings;
 }
 
-export interface DyadEngineProvider {
+export interface OliveAgentEngineProvider {
   /**
 Creates a model for text generation.
 */
@@ -65,11 +65,11 @@ Creates a chat model for text generation.
   ): LanguageModelV2;
 }
 
-export function createDyadEngine(
+export function createOliveAgentEngine(
   options: ExampleProviderSettings,
-): DyadEngineProvider {
+): OliveAgentEngineProvider {
   const baseURL = withoutTrailingSlash(options.baseURL);
-  logger.info("creating dyad engine with baseURL", baseURL);
+  logger.info("creating oliveagent engine with baseURL", baseURL);
 
   // Track request ID attempts
   const requestIdAttempts = new Map<string, number>();
@@ -77,7 +77,7 @@ export function createDyadEngine(
   const getHeaders = () => ({
     Authorization: `Bearer ${loadApiKey({
       apiKey: options.apiKey,
-      environmentVariableName: "DYAD_PRO_API_KEY",
+      environmentVariableName: "OLIVEAGENT_PRO_API_KEY",
       description: "Example API key",
     })}`,
     ...options.headers,
@@ -91,7 +91,7 @@ export function createDyadEngine(
   }
 
   const getCommonModelConfig = (): CommonModelConfig => ({
-    provider: `dyad-engine`,
+    provider: `oliveagent-engine`,
     url: ({ path }) => {
       const url = new URL(`${baseURL}${path}`);
       if (options.queryParams) {
@@ -125,29 +125,29 @@ export function createDyadEngine(
               options.settings,
             ),
           };
-          const dyadVersionedFiles = parsedBody.dyadVersionedFiles;
-          if ("dyadVersionedFiles" in parsedBody) {
-            delete parsedBody.dyadVersionedFiles;
+          const oliveagentVersionedFiles = parsedBody.oliveagentVersionedFiles;
+          if ("oliveagentVersionedFiles" in parsedBody) {
+            delete parsedBody.oliveagentVersionedFiles;
           }
-          const dyadFiles = parsedBody.dyadFiles;
-          if ("dyadFiles" in parsedBody) {
-            delete parsedBody.dyadFiles;
+          const oliveagentFiles = parsedBody.oliveagentFiles;
+          if ("oliveagentFiles" in parsedBody) {
+            delete parsedBody.oliveagentFiles;
           }
-          const requestId = parsedBody.dyadRequestId;
-          if ("dyadRequestId" in parsedBody) {
-            delete parsedBody.dyadRequestId;
+          const requestId = parsedBody.oliveagentRequestId;
+          if ("oliveagentRequestId" in parsedBody) {
+            delete parsedBody.oliveagentRequestId;
           }
-          const dyadAppId = parsedBody.dyadAppId;
-          if ("dyadAppId" in parsedBody) {
-            delete parsedBody.dyadAppId;
+          const oliveagentAppId = parsedBody.oliveagentAppId;
+          if ("oliveagentAppId" in parsedBody) {
+            delete parsedBody.oliveagentAppId;
           }
-          const dyadDisableFiles = parsedBody.dyadDisableFiles;
-          if ("dyadDisableFiles" in parsedBody) {
-            delete parsedBody.dyadDisableFiles;
+          const oliveagentDisableFiles = parsedBody.oliveagentDisableFiles;
+          if ("oliveagentDisableFiles" in parsedBody) {
+            delete parsedBody.oliveagentDisableFiles;
           }
-          const dyadMentionedApps = parsedBody.dyadMentionedApps;
-          if ("dyadMentionedApps" in parsedBody) {
-            delete parsedBody.dyadMentionedApps;
+          const oliveagentMentionedApps = parsedBody.oliveagentMentionedApps;
+          if ("oliveagentMentionedApps" in parsedBody) {
+            delete parsedBody.oliveagentMentionedApps;
           }
 
           // Track and modify requestId with attempt number
@@ -159,19 +159,19 @@ export function createDyadEngine(
           }
 
           // Add files to the request if they exist
-          if (!dyadDisableFiles) {
-            parsedBody.dyad_options = {
-              files: dyadFiles,
-              versioned_files: dyadVersionedFiles,
-              enable_lazy_edits: options.dyadOptions.enableLazyEdits,
+          if (!oliveagentDisableFiles) {
+            parsedBody.oliveagent_options = {
+              files: oliveagentFiles,
+              versioned_files: oliveagentVersionedFiles,
+              enable_lazy_edits: options.oliveagentOptions.enableLazyEdits,
               enable_smart_files_context:
-                options.dyadOptions.enableSmartFilesContext,
-              smart_context_mode: options.dyadOptions.smartContextMode,
-              enable_web_search: options.dyadOptions.enableWebSearch,
-              app_id: dyadAppId,
+                options.oliveagentOptions.enableSmartFilesContext,
+              smart_context_mode: options.oliveagentOptions.smartContextMode,
+              enable_web_search: options.oliveagentOptions.enableWebSearch,
+              app_id: oliveagentAppId,
             };
-            if (dyadMentionedApps?.length) {
-              parsedBody.dyad_options.mentioned_apps = dyadMentionedApps;
+            if (oliveagentMentionedApps?.length) {
+              parsedBody.oliveagent_options.mentioned_apps = oliveagentMentionedApps;
             }
           }
 
@@ -181,7 +181,7 @@ export function createDyadEngine(
             headers: {
               ...init.headers,
               ...(modifiedRequestId && {
-                "X-Dyad-Request-Id": modifiedRequestId,
+                "X-OliveAgent-Request-Id": modifiedRequestId,
               }),
             },
             body: JSON.stringify(parsedBody),

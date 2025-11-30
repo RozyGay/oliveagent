@@ -2,12 +2,12 @@ import React, { useMemo, useState } from "react";
 import { CheckCircle, ChevronsUpDown, ChevronsDownUp } from "lucide-react";
 import { CodeHighlight } from "./CodeHighlight";
 
-interface DyadMcpToolResultProps {
+interface OliveAgentMcpToolResultProps {
   node?: any;
   children?: React.ReactNode;
 }
 
-export const DyadMcpToolResult: React.FC<DyadMcpToolResultProps> = ({
+export const OliveAgentMcpToolResult: React.FC<OliveAgentMcpToolResultProps> = ({
   node,
   children,
 }) => {
@@ -23,7 +23,7 @@ export const DyadMcpToolResult: React.FC<DyadMcpToolResultProps> = ({
       const parsed = JSON.parse(raw);
       return JSON.stringify(parsed, null, 2);
     } catch (e) {
-      console.error("Error parsing JSON for dyad-mcp-tool-result", e);
+      console.error("Error parsing JSON for oliveagent-mcp-tool-result", e);
       return raw;
     }
   }, [expanded, raw]);

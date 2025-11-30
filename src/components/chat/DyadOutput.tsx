@@ -9,13 +9,13 @@ import {
 import { useAtomValue } from "jotai";
 import { selectedChatIdAtom } from "@/atoms/chatAtoms";
 import { useStreamChat } from "@/hooks/useStreamChat";
-interface DyadOutputProps {
+interface OliveAgentOutputProps {
   type: "error" | "warning";
   message?: string;
   children?: React.ReactNode;
 }
 
-export const DyadOutput: React.FC<DyadOutputProps> = ({
+export const OliveAgentOutput: React.FC<OliveAgentOutputProps> = ({
   type,
   message,
   children,
