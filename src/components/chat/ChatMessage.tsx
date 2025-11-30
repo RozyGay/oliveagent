@@ -90,8 +90,10 @@ const ChatMessage = ({ message, isLastMessage }: ChatMessageProps) => {
     >
       <div className={`mt-2 w-full max-w-3xl mx-auto group`}>
         <div
-          className={`rounded-lg p-2 ${
-            message.role === "assistant" ? "" : "ml-24 bg-(--sidebar-accent)"
+          className={`rounded-xl p-3 transition-all duration-200 ${
+            message.role === "assistant"
+              ? "bg-gradient-to-br from-gray-50/50 to-blue-50/30 dark:from-gray-900/50 dark:to-blue-950/30 border border-gray-200 dark:border-gray-700"
+              : "ml-24 bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-200/50 dark:shadow-blue-900/50"
           }`}
         >
           {message.role === "assistant" &&

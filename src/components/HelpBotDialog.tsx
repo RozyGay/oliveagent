@@ -158,9 +158,11 @@ export function HelpBotDialog({ isOpen, onClose }: HelpBotDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl border-2 border-blue-200 dark:border-blue-800 shadow-2xl">
         <DialogHeader>
-          <DialogTitle>OliveAgent Help Bot</DialogTitle>
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            OliveAgent Help Bot
+          </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-3 h-[480px]">
           {error && (
