@@ -7,7 +7,7 @@ import {
   getOrCreateServiceRoleKey,
   getServiceRoleKeys,
   upsertServiceRoleKey,
-} from "@dyad-sh/supabase-management-js";
+} from "@oliveagent/supabase-management-js";
 import log from "electron-log";
 import { IS_TEST_BUILD } from "../ipc/utils/test_utils";
 

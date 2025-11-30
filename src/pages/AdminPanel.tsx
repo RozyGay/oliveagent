@@ -169,7 +169,7 @@ export default function AdminPanelPage() {
         </div>
 
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          © 2024 Dyad by Rozy. All rights reserved.
+          © 2024 OliveAgent by Rozy. All rights reserved.
         </div>
       </div>
     </div>

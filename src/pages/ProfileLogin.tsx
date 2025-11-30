@@ -50,7 +50,7 @@ export default function ProfileLoginPage() {
             </div>
           </div>
           <CardTitle className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400 bg-clip-text text-transparent">
-            Welcome to Dyad
+            Welcome to OliveAgent
           </CardTitle>
           <CardDescription className="text-base">
             Sign in to your profile to continue

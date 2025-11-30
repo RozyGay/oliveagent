@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Globe, Loader } from "lucide-react";
-import { VanillaMarkdownParser } from "./DyadMarkdownParser";
+import { VanillaMarkdownParser } from "./OliveAgentMarkdownParser";
 import { CustomTagState } from "./stateTypes";
 
 interface OliveAgentWebSearchResultProps {
