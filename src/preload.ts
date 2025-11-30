@@ -140,6 +140,13 @@ const validInvokeChannels = [
   // We can't detect with IS_TEST_BUILD in the preload script because
   // it's a separate process from the main process.
   "supabase:fake-connect-and-set-project",
+  "profile:login",
+  "profile:get-current",
+  "profile:logout",
+  "profile:admin:list-users",
+  "profile:admin:set-provider-key",
+  "profile:admin:toggle-user",
+  "profile:get-managed-keys",
 ];
 
 // Add valid receive channels

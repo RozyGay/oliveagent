@@ -13,32 +13,19 @@ import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { Button } from "./ui/button";
 
 export function ProBanner() {
-  const { settings } = useSettings();
-  const { userBudget } = useUserBudgetInfo();
-
-  const [selectedBanner] = useState<"ai" | "smart" | "turbo">(() => {
-    const options = ["ai", "smart", "turbo"] as const;
-    return options[Math.floor(Math.random() * options.length)];
-  });
-
-  if (settings?.enableOliveAgentPro || userBudget) {
-    return (
-      <div className="mt-6 max-w-2xl mx-auto">
-        <ManageOliveAgentProButton />
-      </div>
-    );
-  }
-
   return (
     <div className="mt-6 max-w-2xl mx-auto">
-      {selectedBanner === "ai" ? (
-        <AiAccessBanner />
-      ) : selectedBanner === "smart" ? (
-        <SmartContextBanner />
-      ) : (
-        <TurboBanner />
-      )}
-      <SetupOliveAgentProButton />
+      <div className="w-full py-4 px-6 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 dark:from-purple-700 dark:via-pink-700 dark:to-purple-700 shadow-xl border-2 border-purple-300 dark:border-purple-500">
+        <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-green-400 animate-pulse shadow-lg shadow-green-400/50"></div>
+            <span className="text-2xl font-bold text-white">✨ Pro Mode Active</span>
+          </div>
+        </div>
+        <p className="text-center text-white/90 mt-2 text-sm">
+          All premium features are enabled for free! Made with ❤️ by Rozy
+        </p>
+      </div>
     </div>
   );
 }
