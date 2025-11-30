@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Brain, ChevronDown, ChevronUp, Loader } from "lucide-react";
-import { VanillaMarkdownParser } from "./OliveAgentMarkdownParser";
+import { VanillaMarkdownParser } from "./DyadMarkdownParser";
 import { CustomTagState } from "./stateTypes";
 import { OliveAgentTokenSavings } from "./OliveAgentTokenSavings";
 

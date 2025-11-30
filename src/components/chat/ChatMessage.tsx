@@ -2,7 +2,7 @@ import type { Message } from "@/ipc/ipc_types";
 import {
   OliveAgentMarkdownParser,
   VanillaMarkdownParser,
-} from "./OliveAgentMarkdownParser";
+} from "./DyadMarkdownParser";
 import { motion } from "framer-motion";
 import { useStreamChat } from "@/hooks/useStreamChat";
 import {
