@@ -1,0 +1,46 @@
+Welcome to OliveAgent Setup!
+==============================
+
+OliveAgent is a free, local, open-source AI app builder.
+
+Key Features:
+-------------
+* Build AI-powered applications locally
+* Support for multiple AI providers (OpenAI, Anthropic, AWS Bedrock, Azure, Google, xAI, and more)
+* Local LLM support (LM Studio, Ollama)
+* Real-time preview and hot reload
+* Built-in code editor with Monaco
+* Database integration (Supabase, Neon)
+* Deployment tools (Vercel, GitHub)
+* Mobile development support (Capacitor)
+
+System Requirements:
+-------------------
+* Windows 10 or later (64-bit)
+* 4 GB RAM minimum (8 GB recommended)
+* 500 MB free disk space
+* Internet connection for AI provider access
+
+Before Installation:
+-------------------
+1. Close all running instances of OliveAgent
+2. Make sure you have administrator privileges if needed
+3. Choose your installation directory
+
+What's New in v0.28.0:
+---------------------
+Check the release notes at:
+https://github.com/oliveagent-sh/oliveagent/releases
+
+License:
+--------
+This software is licensed under the MIT License.
+See LICENSE file for details.
+
+Support:
+--------
+If you encounter any issues:
+* Visit: https://github.com/oliveagent-sh/oliveagent/issues
+* Documentation: https://github.com/oliveagent-sh/oliveagent
+
+Click Next to continue with the installation.

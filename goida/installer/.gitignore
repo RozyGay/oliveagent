@@ -1,0 +1,18 @@
+# Build output
+output/
+*.exe
+
+# Inno Setup temporary files
+*.tmp
+~*
+
+# Custom images (if you add them)
+# installer-side.bmp
+# installer-icon.bmp
+
+# Logs
+*.log
+Setup*.txt
+
+# Node modules (if needed)
+node_modules/

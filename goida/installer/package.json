@@ -1,0 +1,20 @@
+{
+  "name": "oliveagent-windows-installer",
+  "version": "1.0.0",
+  "description": "Beautiful Windows installer for OliveAgent",
+  "scripts": {
+    "build": "node build.js",
+    "build:windows": "powershell -ExecutionPolicy Bypass -File ./build-installer.ps1",
+    "build:unix": "bash ./build-installer.sh",
+    "build:skip-app": "powershell -ExecutionPolicy Bypass -File ./build-installer.ps1 -SkipBuild",
+    "build:nsis": "makensis oliveagent-nsis.nsi",
+    "clean": "node -e \"require('fs').rmSync('output', { recursive: true, force: true });\""
+  },
+  "keywords": [
+    "installer",
+    "windows",
+    "inno-setup"
+  ],
+  "author": "OliveAgent Team",
+  "license": "MIT"
+}
