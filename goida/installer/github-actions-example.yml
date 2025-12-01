@@ -1,0 +1,192 @@
+# Example GitHub Actions workflow for building Windows installer
+# Copy this to .github/workflows/build-installer.yml
+
+name: Build Windows Installer
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 0.28.0)'
+        required: true
+        default: '0.28.0'
+
+jobs:
+  build-installer:
+    name: Build Windows Installer
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Electron app
+        run: npm run make
+        env:
+          NODE_ENV: production
+
+      - name: Verify build output
+        run: |
+          if (!(Test-Path "out\OliveAgent-win32-x64\OliveAgent.exe")) {
+            Write-Error "Build output not found!"
+            exit 1
+          }
+          Write-Host "✓ Build output verified"
+        shell: powershell
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+          echo "C:\Program Files (x86)\Inno Setup 6" >> $env:GITHUB_PATH
+        shell: powershell
+
+      - name: Build installer with Inno Setup
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" goida/installer/oliveagent-setup.iss
+        shell: powershell
+
+      - name: Verify installer was created
+        run: |
+          $installer = Get-ChildItem -Path "goida/installer/output" -Filter "*.exe" | Select-Object -First 1
+          if (!$installer) {
+            Write-Error "Installer not found!"
+            exit 1
+          }
+          $sizeMB = [math]::Round($installer.Length / 1MB, 2)
+          Write-Host "✓ Installer created: $($installer.Name) ($sizeMB MB)"
+        shell: powershell
+
+      # Optional: Code signing
+      # Uncomment if you have a code signing certificate
+      # - name: Sign installer
+      #   run: |
+      #     # Decode certificate from base64 secret
+      #     $certBytes = [Convert]::FromBase64String("${{ secrets.CERT_BASE64 }}")
+      #     $certPath = Join-Path $env:TEMP "cert.pfx"
+      #     [IO.File]::WriteAllBytes($certPath, $certBytes)
+      #     
+      #     # Sign the installer
+      #     $installer = Get-ChildItem -Path "goida/installer/output" -Filter "*.exe" | Select-Object -First 1
+      #     & signtool sign /f $certPath /p "${{ secrets.CERT_PASSWORD }}" `
+      #       /tr http://timestamp.digicert.com /td SHA256 /fd SHA256 `
+      #       $installer.FullName
+      #     
+      #     # Clean up certificate
+      #     Remove-Item $certPath
+      #   shell: powershell
+
+      - name: Get version from tag or input
+        id: version
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ github.event.inputs.version }}"
+          } else {
+            $version = "${{ github.ref_name }}" -replace '^v', ''
+          }
+          echo "version=$version" >> $env:GITHUB_OUTPUT
+          echo "Version: $version"
+        shell: powershell
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OliveAgent-Setup-${{ steps.version.outputs.version }}
+          path: goida/installer/output/*.exe
+          retention-days: 30
+
+      - name: Create Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: goida/installer/output/*.exe
+          draft: true
+          generate_release_notes: true
+          body: |
+            ## OliveAgent v${{ steps.version.outputs.version }}
+            
+            ### 🎉 Downloads
+            
+            **Windows Installer:**
+            - OliveAgent-Setup-${{ steps.version.outputs.version }}.exe
+            
+            ### 📝 Installation
+            
+            1. Download the installer
+            2. Run the .exe file
+            3. Follow the installation wizard
+            4. Launch OliveAgent!
+            
+            ### 🔐 Security Note
+            
+            The installer may show a Windows SmartScreen warning on first run. 
+            This is normal for new applications. Click "More info" → "Run anyway".
+            
+            Future releases will be code-signed to avoid this warning.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload to Microsoft Store (Optional)
+        if: false  # Enable if you want to publish to MS Store
+        run: |
+          # Example MS Store upload
+          # Requires StoreBroker PowerShell module and credentials
+          Write-Host "MS Store publishing not implemented"
+        shell: powershell
+
+  # Optional: Test installation
+  test-installer:
+    name: Test Installer
+    needs: build-installer
+    runs-on: windows-latest
+    
+    steps:
+      - name: Download installer
+        uses: actions/download-artifact@v4
+        with:
+          name: OliveAgent-Setup-*
+          path: installer
+
+      - name: Test silent installation
+        run: |
+          $installer = Get-ChildItem -Path "installer" -Filter "*.exe" | Select-Object -First 1
+          
+          # Silent install
+          Start-Process -FilePath $installer.FullName -ArgumentList "/VERYSILENT /NORESTART" -Wait
+          
+          # Verify installation
+          $installPath = "$env:LOCALAPPDATA\OliveAgent\OliveAgent.exe"
+          if (!(Test-Path $installPath)) {
+            Write-Error "Installation failed - app not found at $installPath"
+            exit 1
+          }
+          
+          Write-Host "✓ Installation successful"
+          
+          # Test uninstall
+          $uninstaller = "$env:LOCALAPPDATA\OliveAgent\Uninstall.exe"
+          if (Test-Path $uninstaller) {
+            Start-Process -FilePath $uninstaller -ArgumentList "/VERYSILENT /NORESTART" -Wait
+            Write-Host "✓ Uninstallation successful"
+          }
+        shell: powershell
+
+# Environment variables you may need to set in GitHub Secrets:
+# - CERT_BASE64: Base64-encoded code signing certificate
+# - CERT_PASSWORD: Certificate password
+# - APPLE_ID: For macOS notarization (if building for macOS too)
+# - APPLE_PASSWORD: App-specific password
+# - APPLE_TEAM_ID: Apple Developer Team ID
