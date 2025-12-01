@@ -280,11 +280,11 @@ export const UserSettingsSchema = z.object({
  */
 export type UserSettings = z.infer<typeof UserSettingsSchema>;
 
-export function isOliveAgentProEnabled(settings: UserSettings): boolean {
+export function isOliveAgentProEnabled(_settings: UserSettings): boolean {
   return true;
 }
 
-export function hasOliveAgentProKey(settings: UserSettings): boolean {
+export function hasOliveAgentProKey(_settings: UserSettings): boolean {
   return true;
 }
 
