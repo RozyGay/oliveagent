@@ -5,11 +5,7 @@ import googleLogo from "../../assets/ai-logos/google-logo.svg";
 // @ts-ignore
 import anthropicLogo from "../../assets/ai-logos/anthropic-logo.svg";
 import { IpcClient } from "@/ipc/ipc_client";
-import { useState } from "react";
 import { KeyRound } from "lucide-react";
-
-import { useSettings } from "@/hooks/useSettings";
-import { useUserBudgetInfo } from "@/hooks/useUserBudgetInfo";
 import { Button } from "./ui/button";
 
 export function ProBanner() {

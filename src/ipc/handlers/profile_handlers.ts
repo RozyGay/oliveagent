@@ -190,9 +190,9 @@ export function registerProfileHandlers() {
       try {
         const settings = requireAdmin();
         const adminManagedKeys = {
-          ...(settings.adminManagedKeys ?? {}),
+          ...settings.adminManagedKeys,
           [username]: {
-            ...(settings.adminManagedKeys?.[username] ?? {}),
+            ...settings.adminManagedKeys?.[username],
             [provider]: apiKey,
           },
         };
